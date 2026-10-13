@@ -1156,13 +1156,11 @@
             프로필 수정</button>
         </div>
         <div id="myMemberProfile" class="muted" style="margin-top:12px">본인 프로필 설정 후 구력 확인</div>
-        <div id="myEditPanel" hidden style="margin-top:14px"><label>본인 프로필 선택<select id="myMemberSelect"
-              onchange="setWtwtDeviceMember(this.value);renderMyMember();loadMyProfile()">
-              <option value="">프로필 선택</option>
-            </select></label>
+        <div id="myEditPanel" hidden style="margin-top:14px">
           <div class="profile-edit-grid"><label>이름<input id="editMyName" placeholder="이름"></label><label>테니스 시작일<input
                 id="editMyStart" type="date"></label><label>전화번호<input id="editMyPhone" type="tel"></label><label>카카오
               ID<input id="editMyKakao"></label></div><button class="green" onclick="saveMyProfile()">저장하기</button>
+          <p class="muted" id="myProfileMessage" aria-live="polite"></p>
         </div>
       </div>
       <div class="card"><b>내 기록</b>
@@ -1513,7 +1511,7 @@
     function wtwtEscape(s) { return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])) }
     function wtwtTenure(v) { if (!v) return '미등록'; const d = new Date(v + 'T12:00:00'), now = new Date(); if (isNaN(d.getTime()) || d > now) return '확인 필요'; const months = (now.getFullYear() - d.getFullYear()) * 12 + now.getMonth() - d.getMonth() - (now.getDate() < d.getDate() ? 1 : 0); return Math.floor(months / 12) + '년 ' + months % 12 + '개월' }
     function renderMyMember() { const m = currentWtwtMember(); document.getElementById('myMemberProfile').textContent = m ? m.name + ' · 구력 ' + wtwtTenure(m.start) : '본인 프로필 설정 후 구력 확인' }
-    function renderWtwtMembers() { const a = wtwtMembers(); const count = document.getElementById('memberCount'); if (!count) return; count.textContent = a.length;[['countMon', '월'], ['countWed', '수'], ['countSat', '토'], ['countSun', '일']].forEach(([id, d]) => document.getElementById(id).textContent = a.filter(x => x.days.includes(d)).length); document.getElementById('wtwtMemberList').innerHTML = a.length ? a.map(m => `<div class="item" style="margin-top:8px"><div class="row"><b>${wtwtEscape(m.name)}</b><span>${m.days.join('·')} · ${wtwtFee(m.days).toLocaleString()} VND/월</span></div><div style="display:flex;gap:12px;flex-wrap:wrap;margin:9px 0">${['월', '수', '토', '일'].map(d => `<label><input type="checkbox" ${m.days.includes(d) ? 'checked' : ''} onchange="wtwtUpdate('${m.id}','days',this.checked?[...new Set([...wtwtMembers().find(x=>x.id==='${m.id}').days,'${d}'])]:wtwtMembers().find(x=>x.id==='${m.id}').days.filter(x=>x!=='${d}'))">${d}</label>`).join('')}</div><div style="display:flex;gap:12px;flex-wrap:wrap"><label><input type="checkbox" ${m.monthlyPaid ? 'checked' : ''} onchange="wtwtUpdate('${m.id}','monthlyPaid',this.checked)"> 월 회비 납부</label><label><input type="checkbox" ${m.joiningPaid ? 'checked' : ''} onchange="wtwtUpdate('${m.id}','joiningPaid',this.checked)"> 입단비 100만동 납부</label><label><input type="checkbox" ${m.shirtGiven ? 'checked' : ''} onchange="wtwtUpdate('${m.id}','shirtGiven',this.checked)"> 티셔츠 지급</label></div><button class="soft" style="margin-top:8px" onclick="wtwtDelete('${m.id}')">회원 삭제</button></div>`).join('') : '<p class="muted">새로 등록한 회원이 아직 없습니다. 기존 화면의 예시 회원과 별도로 관리됩니다.</p>'; const pub = document.getElementById('publicMemberList'); if (pub) pub.innerHTML = a.map(m => '<div class="item"><b>' + wtwtEscape(m.name) + '</b> · ' + wtwtEscape(m.role || '회원') + '<div class="muted">테니스 시작 ' + wtwtEscape(m.start || '미등록') + ' · 구력 ' + wtwtTenure(m.start) + ' · ' + wtwtEscape(m.days.join('·')) + '요일</div></div>').join('') || '등록된 회원 없음'; const sel = document.getElementById('myMemberSelect'); if (sel) { const old = sel.value; sel.innerHTML = '<option value="">최초 1회 본인 프로필 설정</option>' + a.map(m => '<option value="' + wtwtEscape(m.id) + '">' + wtwtEscape(m.name) + '</option>').join(''); sel.value = localStorage.getItem(WTWT_DEVICE_MEMBER) || old; renderMyMember() } document.getElementById('duesSummary').textContent = '등록 회원 ' + a.length + '명 · 월 회비 예상 합계 ' + a.reduce((n, m) => n + wtwtFee(m.days), 0).toLocaleString() + ' VND · 입단비 납부 ' + a.filter(m => m.joiningPaid).length + '명 · 티셔츠 미지급 ' + a.filter(m => m.joiningPaid && !m.shirtGiven).length + '명' }
+    function renderWtwtMembers() { const a = wtwtMembers(); const count = document.getElementById('memberCount'); if (!count) return; count.textContent = a.length;[['countMon', '월'], ['countWed', '수'], ['countSat', '토'], ['countSun', '일']].forEach(([id, d]) => document.getElementById(id).textContent = a.filter(x => x.days.includes(d)).length); document.getElementById('wtwtMemberList').innerHTML = a.length ? a.map(m => `<div class="item" style="margin-top:8px"><div class="row"><b>${wtwtEscape(m.name)}</b><span>${m.days.join('·')} · ${wtwtFee(m.days).toLocaleString()} VND/월</span></div><div style="display:flex;gap:12px;flex-wrap:wrap;margin:9px 0">${['월', '수', '토', '일'].map(d => `<label><input type="checkbox" ${m.days.includes(d) ? 'checked' : ''} onchange="wtwtUpdate('${m.id}','days',this.checked?[...new Set([...wtwtMembers().find(x=>x.id==='${m.id}').days,'${d}'])]:wtwtMembers().find(x=>x.id==='${m.id}').days.filter(x=>x!=='${d}'))">${d}</label>`).join('')}</div><div style="display:flex;gap:12px;flex-wrap:wrap"><label><input type="checkbox" ${m.monthlyPaid ? 'checked' : ''} onchange="wtwtUpdate('${m.id}','monthlyPaid',this.checked)"> 월 회비 납부</label><label><input type="checkbox" ${m.joiningPaid ? 'checked' : ''} onchange="wtwtUpdate('${m.id}','joiningPaid',this.checked)"> 입단비 100만동 납부</label><label><input type="checkbox" ${m.shirtGiven ? 'checked' : ''} onchange="wtwtUpdate('${m.id}','shirtGiven',this.checked)"> 티셔츠 지급</label></div><button class="soft" style="margin-top:8px" onclick="wtwtDelete('${m.id}')">회원 삭제</button></div>`).join('') : '<p class="muted">새로 등록한 회원이 아직 없습니다. 기존 화면의 예시 회원과 별도로 관리됩니다.</p>'; const pub = document.getElementById('publicMemberList'); if (pub) pub.innerHTML = a.map(m => '<div class="item"><b>' + wtwtEscape(m.name) + '</b> · ' + wtwtEscape(m.role || '회원') + '<div class="muted">테니스 시작 ' + wtwtEscape(m.start || '미등록') + ' · 구력 ' + wtwtTenure(m.start) + ' · ' + wtwtEscape(m.days.join('·')) + '요일</div></div>').join('') || '등록된 회원 없음'; renderMyMember(); document.getElementById('duesSummary').textContent = '등록 회원 ' + a.length + '명 · 월 회비 예상 합계 ' + a.reduce((n, m) => n + wtwtFee(m.days), 0).toLocaleString() + ' VND · 입단비 납부 ' + a.filter(m => m.joiningPaid).length + '명 · 티셔츠 미지급 ' + a.filter(m => m.joiningPaid && !m.shirtGiven).length + '명' }
     window.addEventListener('DOMContentLoaded', renderWtwtMembers);
 
     const wtwtWeekDays = ['월', '수', '토', '일'];
@@ -1529,8 +1527,51 @@
     function attDay(date) { return ['일', '월', '화', '수', '목', '금', '토'][new Date(date + 'T12:00:00').getDay()] }
     // Test-only device identity. Real authentication requires a shared backend.
     const WTWT_DEVICE_MEMBER = 'wtwt-device-member-id';
-    function currentWtwtMember() { return wtwtMembers().find(m => m.id === localStorage.getItem(WTWT_DEVICE_MEMBER)) || null }
+    function currentWtwtMember() {
+      const id = localStorage.getItem(WTWT_DEVICE_MEMBER);
+      const all = wtwtMembers();
+      return all.find(m => m.id === id) || all.find(m => window.wtwtCurrentUserId && m.id === window.wtwtCurrentUserId) || null;
+    }
     function setWtwtDeviceMember(id) { if (id && wtwtMembers().some(m => m.id === id)) localStorage.setItem(WTWT_DEVICE_MEMBER, id); else localStorage.removeItem(WTWT_DEVICE_MEMBER); renderAttendance() }
+    async function syncMyApprovedProfile() {
+      if (!wtwtSB) return null;
+      const { data: { user } } = await wtwtSB.auth.getUser();
+      if (!user) return null;
+      window.wtwtCurrentUserId = user.id;
+      const { data: profile, error } = await wtwtSB.from('wtwt_member_signups')
+        .select('user_id,name,gender,start_date,phone,kakao,days,status')
+        .eq('user_id', user.id).eq('status', 'approved').maybeSingle();
+      if (error) throw error;
+      if (!profile) return null;
+      const all = wtwtMembers();
+      let m = all.find(x => x.id === user.id);
+      if (!m) {
+        m = { id: user.id, role: '회원', grade: '', joiningPaid: false, shirtGiven: false, monthlyPaid: false };
+        all.push(m);
+      }
+      Object.assign(m, { name: profile.name, gender: profile.gender, start: profile.start_date, phone: profile.phone || '', kakao: profile.kakao || '', days: profile.days || [] });
+      localStorage.setItem(wtwtStorageKey, JSON.stringify(all));
+      localStorage.setItem(WTWT_DEVICE_MEMBER, user.id);
+      renderWtwtMembers();
+      renderMyMember();
+      return m;
+    }
+    async function loadMyProfile() {
+      const msg = document.getElementById('myProfileMessage');
+      if (msg) msg.textContent = '프로필을 불러오는 중…';
+      try {
+        const m = await syncMyApprovedProfile() || currentWtwtMember();
+        if (!m) {
+          if (msg) msg.textContent = '승인된 회원 프로필을 찾을 수 없습니다. 운영진에게 확인해 주세요.';
+          return;
+        }
+        document.getElementById('editMyName').value = m.name || '';
+        document.getElementById('editMyStart').value = m.start || '';
+        document.getElementById('editMyPhone').value = m.phone || '';
+        document.getElementById('editMyKakao').value = m.kakao || '';
+        if (msg) msg.textContent = '';
+      } catch (e) { if (msg) msg.textContent = '프로필을 불러오지 못했습니다: ' + (e.message || e); }
+    }
     const WTWT_ROUND_PREF_KEY = 'wtwt-att-round-prefs-v1';
     function attRoundPrefs(date) { return guestGet(WTWT_ROUND_PREF_KEY, {})[date] || {} }
     function attSaveRoundPrefs() { const date = document.getElementById('attDate').value, m = currentWtwtMember(); if (!m || attRecords()[date + '|' + m.id] !== '참석') return alert('먼저 참석 신청을 해 주세요.'); const start = Number(document.getElementById('attStartRound').value) || 1, end = Number(document.getElementById('attEndRound').value) || 0; if (end && start > end) return alert('마지막 라운드는 첫 라운드보다 빠를 수 없습니다.'); const all = guestGet(WTWT_ROUND_PREF_KEY, {}); all[date] = { ...(all[date] || {}), [m.id]: { start, end } }; localStorage.setItem(WTWT_ROUND_PREF_KEY, JSON.stringify(all)); renderAttendance(); alert('출전 가능 라운드를 저장했습니다. 나중에 다시 수정할 수 있어요.'); }
@@ -1800,7 +1841,31 @@
     document.addEventListener('DOMContentLoaded', () => { renderApprovedMemberDirectory() });
 
     function clubPanel(name) { go('clubDetail'); document.getElementById('clubDetailTitle').textContent = name; document.getElementById('clubDetailBody').textContent = name === '클럽 소개' ? 'WE TENNIS ★ WINNING TENNIS · 혼자보다 함께 할 때 더 즐거운 테니스. 즐겁게 치다보면 어느 새 한단계 더 성장하는 테니스' : '콘텐츠 등록 기능은 추후 공유 데이터베이스 연결 후 제공됩니다.' }
-    function saveMyProfile() { const m = currentWtwtMember(); if (!m) return alert('프로필을 선택해 주세요.'); const name = document.getElementById('editMyName').value.trim(); if (!name) return alert('이름을 입력해 주세요.'); const all = wtwtMembers(); const ix = all.findIndex(x => x.id === m.id); if (ix < 0) return; Object.assign(all[ix], { name, start: document.getElementById('editMyStart').value, phone: document.getElementById('editMyPhone').value, kakao: document.getElementById('editMyKakao').value }); wtwtSave(all); renderMyMember(); alert('이 브라우저에 프로필을 저장했어요.') }
+    async function saveMyProfile() {
+      const msg = document.getElementById('myProfileMessage');
+      const name = document.getElementById('editMyName').value.trim();
+      if (!name) { if (msg) msg.textContent = '이름을 입력해 주세요.'; return; }
+      if (!wtwtSB) { if (msg) msg.textContent = '서버 연결을 확인할 수 없습니다.'; return; }
+      try {
+        const { data: { user } } = await wtwtSB.auth.getUser();
+        if (!user) { if (msg) msg.textContent = '다시 로그인해 주세요.'; return; }
+        const changes = {
+          name,
+          start_date: document.getElementById('editMyStart').value || null,
+          phone: document.getElementById('editMyPhone').value.trim(),
+          kakao: document.getElementById('editMyKakao').value.trim(),
+          updated_at: new Date().toISOString()
+        };
+        const { data, error } = await wtwtSB.from('wtwt_member_signups')
+          .update(changes).eq('user_id', user.id).eq('status', 'approved')
+          .select('user_id,name,gender,start_date,phone,kakao,days,status').maybeSingle();
+        if (error) throw error;
+        if (!data) { if (msg) msg.textContent = '승인된 프로필을 찾을 수 없습니다. 운영진에게 확인해 주세요.'; return; }
+        await syncMyApprovedProfile();
+        renderMyMember();
+        if (msg) msg.textContent = '프로필이 저장되었습니다.';
+      } catch (e) { if (msg) msg.textContent = '저장 실패: ' + (e.message || e); }
+    }
     const PARTNER_KEY = 'wtwt-partner-board-preview-v1';
     function partnerRecords() { try { return JSON.parse(localStorage.getItem(PARTNER_KEY) || '[]') } catch { return [] } }
     function partnerSave(items) { localStorage.setItem(PARTNER_KEY, JSON.stringify(items)); renderPartnerBoard() }
@@ -1880,7 +1945,7 @@
     async function wtwtAuthSubmit() { if (!wtwtSB) return authMessage('인증 라이브러리를 불러오지 못했습니다. 인터넷 연결을 확인하세요.'); const email = document.getElementById('authEmail').value.trim(), password = document.getElementById('authPassword').value; if (!email || password.length < 6) return authMessage('이메일과 6자 이상 비밀번호를 입력해 주세요.'); try { if (wtwtAuthSignup) { const name = document.getElementById('authName').value.trim(); if (!name) return authMessage('이름을 입력해 주세요.'); const { error } = await wtwtSB.auth.signUp({ email, password, options: { data: { display_name: name }, emailRedirectTo: location.origin + location.pathname } }); if (error) throw error; authMessage('가입 신청 완료. 이메일 인증 후 운영진 승인을 기다려 주세요.') } else { const { error } = await wtwtSB.auth.signInWithPassword({ email, password }); if (error) throw error; await wtwtAuthCheck() } } catch (e) { authMessage(e.message || '로그인에 실패했습니다.') } }
     async function wtwtAuthReset() { if (!wtwtSB) return; const email = document.getElementById('authEmail').value.trim(); if (!email) return authMessage('먼저 이메일을 입력해 주세요.'); const { error } = await wtwtSB.auth.resetPasswordForEmail(email, { redirectTo: location.origin + location.pathname }); authMessage(error ? error.message : '비밀번호 재설정 메일을 확인해 주세요.') }
     async function wtwtAuthSignOut() { await wtwtSB?.auth.signOut(); window.wtwtRole = null; document.getElementById('wtwtAuthGate').hidden = false; document.getElementById('authLogout').style.display = 'none'; go('home') }
-    async function wtwtAuthCheck() { if (!wtwtSB) return authMessage('로그인 서비스를 불러오지 못했습니다.'); const { data: { user }, error } = await wtwtSB.auth.getUser(); if (error || !user) { window.wtwtRole = null; document.getElementById('wtwtAuthGate').hidden = false; return } if (!user.email_confirmed_at) { authMessage('이메일 인증을 완료해 주세요.'); return } const { data: account, error: roleError } = await wtwtSB.from('wtwt_accounts').select('role,display_name').eq('user_id', user.id).maybeSingle(); if (roleError) { authMessage('계정 권한 확인 실패: ' + roleError.message); return } const role = account?.role || 'pending'; window.wtwtRole = role; document.getElementById('wtwtAuthGate').hidden = true; document.getElementById('authLogout').style.display = 'block'; document.getElementById('guestPreviewToggle').style.display = 'none'; if (role === 'pending') { document.querySelectorAll('nav button').forEach(btn => btn.style.display = 'none'); go('memberSignup'); const { data: existing } = await wtwtSB.from('wtwt_member_signups').select('status').eq('user_id', user.id).maybeSingle(); if (existing?.status === 'pending') document.getElementById('signupMessage').textContent = '신청이 접수되어 운영진 승인을 기다리고 있습니다.'; else if (existing?.status === 'rejected') document.getElementById('signupMessage').textContent = '이전 신청이 거절되었습니다. 내용을 확인한 뒤 다시 신청할 수 있습니다.'; return } document.querySelectorAll('nav button').forEach(btn => { const label = btn.textContent.trim(); btn.style.display = role === 'guest' ? (['HOME', 'PLAY', '신청'].includes(label) ? '' : 'none') : label === 'ADMIN' && !['admin', 'super_admin'].includes(role) ? 'none' : '' }); go('home'); if (['admin', 'super_admin'].includes(role)) { await syncApprovedMembersToLocalStorage(); renderSignupPending() } renderApprovedMemberDirectory() }
+    async function wtwtAuthCheck() { if (!wtwtSB) return authMessage('로그인 서비스를 불러오지 못했습니다.'); const { data: { user }, error } = await wtwtSB.auth.getUser(); if (error || !user) { window.wtwtRole = null; document.getElementById('wtwtAuthGate').hidden = false; return } if (!user.email_confirmed_at) { authMessage('이메일 인증을 완료해 주세요.'); return } const { data: account, error: roleError } = await wtwtSB.from('wtwt_accounts').select('role,display_name').eq('user_id', user.id).maybeSingle(); if (roleError) { authMessage('계정 권한 확인 실패: ' + roleError.message); return } const role = account?.role || 'pending'; window.wtwtRole = role; window.wtwtCurrentUserId = user.id; document.getElementById('wtwtAuthGate').hidden = true; document.getElementById('authLogout').style.display = 'block'; document.getElementById('guestPreviewToggle').style.display = 'none'; if (role === 'pending') { document.querySelectorAll('nav button').forEach(btn => btn.style.display = 'none'); go('memberSignup'); const { data: existing } = await wtwtSB.from('wtwt_member_signups').select('status').eq('user_id', user.id).maybeSingle(); if (existing?.status === 'pending') document.getElementById('signupMessage').textContent = '신청이 접수되어 운영진 승인을 기다리고 있습니다.'; else if (existing?.status === 'rejected') document.getElementById('signupMessage').textContent = '이전 신청이 거절되었습니다. 내용을 확인한 뒤 다시 신청할 수 있습니다.'; return } document.querySelectorAll('nav button').forEach(btn => { const label = btn.textContent.trim(); btn.style.display = role === 'guest' ? (['HOME', 'PLAY', '신청'].includes(label) ? '' : 'none') : label === 'ADMIN' && !['admin', 'super_admin'].includes(role) ? 'none' : '' }); go('home'); await syncMyApprovedProfile().catch(e => console.warn('내 프로필 동기화 실패:', e.message)); if (['admin', 'super_admin'].includes(role)) { await syncApprovedMembersToLocalStorage(); renderSignupPending() } renderApprovedMemberDirectory() }
     wtwtSB?.auth.onAuthStateChange(() => { setTimeout(wtwtAuthCheck, 0) }); wtwtAuthCheck();
   </script>
 </body>
