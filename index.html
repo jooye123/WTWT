@@ -1737,6 +1737,45 @@
       await renderApprovedMemberDirectory();
       alert('가입을 승인했습니다. 회원명부에 반영되었습니다. (관리자 화면의 회비·대진 관리 목록은 현재 기기에도 추가했습니다.)');
     }
+    // Keep the admin member-management list in sync across devices using approved server signups.
+    // Existing local-only member records are preserved; approved server members are merged by user ID,
+    // or by matching name + phone when an older local record has a different ID.
+    async function syncApprovedMembersToLocalStorage() {
+      if (!wtwtSB || !window.wtwtRole || !['admin', 'super_admin'].includes(window.wtwtRole)) return;
+      const { data: approved, error } = await wtwtSB
+        .from('wtwt_member_signups')
+        .select('user_id,name,gender,start_date,phone,kakao,days')
+        .eq('status', 'approved');
+      if (error) {
+        console.error('승인 회원 동기화 실패:', error.message);
+        return;
+      }
+      const all = wtwtMembers();
+      let changed = false;
+      (approved || []).forEach(m => {
+        const existing = all.find(x => x.id === m.user_id || (x.name === m.name && x.phone && m.phone && x.phone === m.phone));
+        if (existing) {
+          // Fill missing profile fields but preserve admin-managed fields like dues and grade.
+          if (!existing.id) { existing.id = m.user_id; changed = true; }
+          if (!existing.gender && m.gender) { existing.gender = m.gender; changed = true; }
+          if (!existing.start && m.start_date) { existing.start = m.start_date; changed = true; }
+          if (!existing.phone && m.phone) { existing.phone = m.phone; changed = true; }
+          if (!existing.kakao && m.kakao) { existing.kakao = m.kakao; changed = true; }
+          if ((!existing.days || !existing.days.length) && m.days && m.days.length) { existing.days = m.days; changed = true; }
+          if (!existing.role) { existing.role = '회원'; changed = true; }
+        } else {
+          all.push({
+            id: m.user_id, name: m.name, gender: m.gender, start: m.start_date,
+            phone: m.phone, kakao: m.kakao || '', days: m.days || [], role: '회원',
+            grade: '', joiningPaid: false, shirtGiven: false, monthlyPaid: false
+          });
+          changed = true;
+        }
+      });
+      if (changed) wtwtSave(all);
+      else renderWtwtMembers();
+    }
+
     async function rejectMemberSignup(userId) {
       if (!window.wtwtRole || !['admin', 'super_admin'].includes(window.wtwtRole)) { alert('운영진 계정으로 로그인해 주세요.'); return }
       if (!confirm('이 가입 신청을 거절할까요?')) return;
@@ -1841,7 +1880,7 @@
     async function wtwtAuthSubmit() { if (!wtwtSB) return authMessage('인증 라이브러리를 불러오지 못했습니다. 인터넷 연결을 확인하세요.'); const email = document.getElementById('authEmail').value.trim(), password = document.getElementById('authPassword').value; if (!email || password.length < 6) return authMessage('이메일과 6자 이상 비밀번호를 입력해 주세요.'); try { if (wtwtAuthSignup) { const name = document.getElementById('authName').value.trim(); if (!name) return authMessage('이름을 입력해 주세요.'); const { error } = await wtwtSB.auth.signUp({ email, password, options: { data: { display_name: name }, emailRedirectTo: location.origin + location.pathname } }); if (error) throw error; authMessage('가입 신청 완료. 이메일 인증 후 운영진 승인을 기다려 주세요.') } else { const { error } = await wtwtSB.auth.signInWithPassword({ email, password }); if (error) throw error; await wtwtAuthCheck() } } catch (e) { authMessage(e.message || '로그인에 실패했습니다.') } }
     async function wtwtAuthReset() { if (!wtwtSB) return; const email = document.getElementById('authEmail').value.trim(); if (!email) return authMessage('먼저 이메일을 입력해 주세요.'); const { error } = await wtwtSB.auth.resetPasswordForEmail(email, { redirectTo: location.origin + location.pathname }); authMessage(error ? error.message : '비밀번호 재설정 메일을 확인해 주세요.') }
     async function wtwtAuthSignOut() { await wtwtSB?.auth.signOut(); window.wtwtRole = null; document.getElementById('wtwtAuthGate').hidden = false; document.getElementById('authLogout').style.display = 'none'; go('home') }
-    async function wtwtAuthCheck() { if (!wtwtSB) return authMessage('로그인 서비스를 불러오지 못했습니다.'); const { data: { user }, error } = await wtwtSB.auth.getUser(); if (error || !user) { window.wtwtRole = null; document.getElementById('wtwtAuthGate').hidden = false; return } if (!user.email_confirmed_at) { authMessage('이메일 인증을 완료해 주세요.'); return } const { data: account, error: roleError } = await wtwtSB.from('wtwt_accounts').select('role,display_name').eq('user_id', user.id).maybeSingle(); if (roleError) { authMessage('계정 권한 확인 실패: ' + roleError.message); return } const role = account?.role || 'pending'; window.wtwtRole = role; document.getElementById('wtwtAuthGate').hidden = true; document.getElementById('authLogout').style.display = 'block'; document.getElementById('guestPreviewToggle').style.display = 'none'; if (role === 'pending') { document.querySelectorAll('nav button').forEach(btn => btn.style.display = 'none'); go('memberSignup'); const { data: existing } = await wtwtSB.from('wtwt_member_signups').select('status').eq('user_id', user.id).maybeSingle(); if (existing?.status === 'pending') document.getElementById('signupMessage').textContent = '신청이 접수되어 운영진 승인을 기다리고 있습니다.'; else if (existing?.status === 'rejected') document.getElementById('signupMessage').textContent = '이전 신청이 거절되었습니다. 내용을 확인한 뒤 다시 신청할 수 있습니다.'; return } document.querySelectorAll('nav button').forEach(btn => { const label = btn.textContent.trim(); btn.style.display = role === 'guest' ? (['HOME', 'PLAY', '신청'].includes(label) ? '' : 'none') : label === 'ADMIN' && !['admin', 'super_admin'].includes(role) ? 'none' : '' }); go('home'); if (['admin', 'super_admin'].includes(role)) renderSignupPending(); renderApprovedMemberDirectory() }
+    async function wtwtAuthCheck() { if (!wtwtSB) return authMessage('로그인 서비스를 불러오지 못했습니다.'); const { data: { user }, error } = await wtwtSB.auth.getUser(); if (error || !user) { window.wtwtRole = null; document.getElementById('wtwtAuthGate').hidden = false; return } if (!user.email_confirmed_at) { authMessage('이메일 인증을 완료해 주세요.'); return } const { data: account, error: roleError } = await wtwtSB.from('wtwt_accounts').select('role,display_name').eq('user_id', user.id).maybeSingle(); if (roleError) { authMessage('계정 권한 확인 실패: ' + roleError.message); return } const role = account?.role || 'pending'; window.wtwtRole = role; document.getElementById('wtwtAuthGate').hidden = true; document.getElementById('authLogout').style.display = 'block'; document.getElementById('guestPreviewToggle').style.display = 'none'; if (role === 'pending') { document.querySelectorAll('nav button').forEach(btn => btn.style.display = 'none'); go('memberSignup'); const { data: existing } = await wtwtSB.from('wtwt_member_signups').select('status').eq('user_id', user.id).maybeSingle(); if (existing?.status === 'pending') document.getElementById('signupMessage').textContent = '신청이 접수되어 운영진 승인을 기다리고 있습니다.'; else if (existing?.status === 'rejected') document.getElementById('signupMessage').textContent = '이전 신청이 거절되었습니다. 내용을 확인한 뒤 다시 신청할 수 있습니다.'; return } document.querySelectorAll('nav button').forEach(btn => { const label = btn.textContent.trim(); btn.style.display = role === 'guest' ? (['HOME', 'PLAY', '신청'].includes(label) ? '' : 'none') : label === 'ADMIN' && !['admin', 'super_admin'].includes(role) ? 'none' : '' }); go('home'); if (['admin', 'super_admin'].includes(role)) { await syncApprovedMembersToLocalStorage(); renderSignupPending() } renderApprovedMemberDirectory() }
     wtwtSB?.auth.onAuthStateChange(() => { setTimeout(wtwtAuthCheck, 0) }); wtwtAuthCheck();
   </script>
 </body>
