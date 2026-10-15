@@ -1,0 +1,2031 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>WTWT CLUB · Sports Dashboard</title>
+  <style>
+    :root {
+      --c: #fbf7ef;
+      --g: #07583f;
+      --p: #ff2d7d;
+      --l: #e7e0d5
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 0;
+      background: var(--c);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #17362d
+    }
+
+    .app {
+      max-width: 440px;
+      margin: auto;
+      padding-bottom: 80px
+    }
+
+    .page {
+      display: none
+    }
+
+    .page.on {
+      display: block
+    }
+
+    header {
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between
+    }
+
+    .logo {
+      width: 95px;
+      height: 80px;
+      object-fit: contain;
+      mix-blend-mode: multiply
+    }
+
+    .card,
+    .hero {
+      margin: 10px 15px;
+      padding: 17px;
+      background: #fffdf9;
+      border: 1px solid var(--l);
+      border-radius: 20px
+    }
+
+    .hero {
+      background: var(--g);
+      color: white
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px
+    }
+
+    .kpi {
+      padding: 12px;
+      border-radius: 14px;
+      background: #ffffff18
+    }
+
+    .kpi b {
+      font-size: 21px
+    }
+
+    .muted {
+      font-size: 12px;
+      color: #7b807b
+    }
+
+    .hero .muted {
+      color: #d7e6e0
+    }
+
+    .pink {
+      color: var(--p)
+    }
+
+    .chip {
+      padding: 5px 8px;
+      border-radius: 99px;
+      background: #ffe0ec;
+      color: #b81555;
+      font-size: 11px;
+      font-weight: 800
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px
+    }
+
+    .item {
+      padding: 13px 0;
+      border-bottom: 1px solid var(--l)
+    }
+
+    button {
+      border: 0;
+      border-radius: 12px;
+      padding: 11px;
+      font-weight: 800
+    }
+
+    .primary {
+      background: var(--p);
+      color: white;
+      width: 100%
+    }
+
+    .green {
+      background: var(--g);
+      color: white;
+      width: 100%
+    }
+
+    .soft {
+      background: #f0ede6;
+      color: var(--g)
+    }
+
+    .match {
+      border-left: 4px solid var(--p);
+      padding-left: 11px
+    }
+
+    .score {
+      font-size: 22px;
+      font-weight: 900
+    }
+
+    .yt {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      color: inherit;
+      text-decoration: none
+    }
+
+    .yt i {
+      font-style: normal;
+      background: red;
+      color: white;
+      padding: 6px 9px;
+      border-radius: 7px
+    }
+
+    .tabs {
+      display: flex;
+      gap: 6px;
+      overflow: auto;
+      padding: 0 15px
+    }
+
+    .tabs button {
+      white-space: nowrap;
+      background: white;
+      border: 1px solid var(--l)
+    }
+
+    .tabs .sel {
+      background: var(--g);
+      color: white
+    }
+
+    .sec {
+      display: none
+    }
+
+    .sec.sel {
+      display: block
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px
+    }
+
+    .profileRow {
+      display: grid;
+      grid-template-columns: 1.3fr .8fr .8fr auto;
+      gap: 6px;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--l)
+    }
+
+    .profileRow select,
+    .profileRow input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid var(--l);
+      border-radius: 10px;
+      background: #fff
+    }
+
+    .subtabs {
+      display: flex;
+      gap: 7px;
+      margin: 8px 0 12px
+    }
+
+    .subtabs button {
+      flex: 1;
+      background: #f0ede6;
+      color: var(--g)
+    }
+
+    .subtabs .sel {
+      background: var(--g);
+      color: #fff
+    }
+
+    .drawView {
+      display: none
+    }
+
+    .drawView.sel {
+      display: block
+    }
+
+    .round {
+      padding: 12px 0;
+      border-bottom: 1px solid var(--l)
+    }
+
+    .round:last-child {
+      border-bottom: 0
+    }
+
+    .badge {
+      font-size: 10px;
+      font-weight: 800;
+      padding: 4px 7px;
+      border-radius: 99px;
+      background: #e9efe9;
+      color: var(--g)
+    }
+
+    td,
+    th {
+      padding: 7px 2px;
+      border-bottom: 1px solid var(--l);
+      text-align: left
+    }
+
+    nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(440px, 100%);
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      background: #fffdf9f5;
+      border-top: 1px solid var(--l)
+    }
+
+    nav button {
+      background: none;
+      color: #777
+    }
+
+    nav .sel {
+      color: var(--p)
+    }
+
+    /* WTWT C · Sports Dashboard */
+    :root {
+      --c: #F8F6F2;
+      --g: #182A43;
+      --p: #E5B75C;
+      --l: #E1E6EC;
+      --blue: #E8EDF3
+    }
+
+    body {
+      background: var(--c);
+      color: #182A43;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif
+    }
+
+    .app {
+      max-width: 480px;
+      padding-bottom: 102px
+    }
+
+    header {
+      padding: 14px 20px 7px;
+      gap: 10px;
+      background: var(--c)
+    }
+
+    header>b {
+      font-size: 12px;
+      letter-spacing: .09em;
+      color: #182A43
+    }
+
+    header .logo {
+      width: 65px;
+      height: 54px;
+      mix-blend-mode: multiply
+    }
+
+    .card,
+    .hero {
+      border: 1px solid #E1E6EC;
+      border-radius: 19px;
+      margin: 12px 16px;
+      padding: 18px;
+      background: #fff;
+      box-shadow: 0 3px 18px rgba(24, 42, 67, .025)
+    }
+
+    .hero {
+      background: #182A43;
+      color: #fff
+    }
+
+    .hero .muted {
+      color: #D4DFEC
+    }
+
+    .muted {
+      color: #778598
+    }
+
+    .chip,
+    .badge {
+      background: #E8EDF3;
+      color: #182A43
+    }
+
+    .pink {
+      color: #B18B3F
+    }
+
+    .primary,
+    .green {
+      background: #182A43;
+      color: white
+    }
+
+    .soft {
+      background: #E8EDF3;
+      color: #182A43
+    }
+
+    button {
+      cursor: pointer
+    }
+
+    .match {
+      border-left-color: #E5B75C
+    }
+
+    .tabs .sel,
+    .subtabs .sel {
+      background: #182A43;
+      color: #fff
+    }
+
+    .subtabs button {
+      background: #E8EDF3;
+      color: #182A43
+    }
+
+    nav {
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      background: #fff;
+      border-top: 1px solid #E1E6EC;
+      box-shadow: 0 -6px 24px #182a430d;
+      padding: 6px 2px max(8px, env(safe-area-inset-bottom))
+    }
+
+    nav button {
+      padding: 11px 2px;
+      font-size: 10px;
+      color: #7A8799;
+      border-radius: 8px
+    }
+
+    nav .sel {
+      color: #182A43;
+      background: #E8EDF3
+    }
+
+    input,
+    select,
+    textarea {
+      accent-color: #182A43
+    }
+
+    a {
+      color: #182A43
+    }
+
+    .dashboard-home {
+      padding-top: 3px
+    }
+
+    .dash-intro {
+      margin: 8px 20px 18px
+    }
+
+    .dash-eyebrow {
+      color: #7B899A;
+      font-size: 10px;
+      letter-spacing: .19em;
+      font-weight: 800
+    }
+
+    .dash-intro h1 {
+      font-size: clamp(35px, 10vw, 48px);
+      letter-spacing: -.055em;
+      line-height: 1.02;
+      margin: 13px 0 10px;
+      color: #182A43;
+      font-weight: 850
+    }
+
+    .dash-intro p {
+      font-size: 10px;
+      letter-spacing: .12em;
+      color: #788699;
+      margin: 0
+    }
+
+    .dash-section-label {
+      margin: 24px 20px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #182A43;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .1em
+    }
+
+    .dash-section-label span {
+      font-size: 11px;
+      color: #8591A1;
+      font-weight: 500;
+      letter-spacing: 0
+    }
+
+    .dash-metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 0 16px
+    }
+
+    .dash-metric {
+      min-height: 128px;
+      border-radius: 18px;
+      background: #E8EDF3;
+      color: #182A43;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: space-between
+    }
+
+    .dash-metric small {
+      font-size: 12px;
+      font-weight: 700
+    }
+
+    .dash-metric strong {
+      font-size: 26px;
+      letter-spacing: -.04em
+    }
+
+    .dash-metric span {
+      font-size: 10px;
+      letter-spacing: .12em;
+      opacity: .7
+    }
+
+    .dash-dark {
+      background: #182A43;
+      color: #fff
+    }
+
+    .dash-yellow {
+      background: #E5B75C;
+      color: #182A43
+    }
+
+    .dash-action-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 12px 16px 18px
+    }
+
+    .dash-action-row button {
+      background: #fff;
+      border: 1px solid #DDE4EC;
+      color: #182A43;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      text-align: left;
+      padding: 15px 13px
+    }
+
+    .dash-action-row span {
+      font-size: 19px
+    }
+
+    .dash-schedule,
+    .dash-youtube,
+    .dash-notice {
+      margin-top: 12px
+    }
+
+    .dash-schedule>.row,
+    .dash-youtube>.row,
+    .dash-notice>.row {
+      margin-bottom: 12px
+    }
+
+    .dash-video-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #E8EDF3;
+      padding: 20px 13px;
+      border-radius: 13px;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700
+    }
+
+    .dash-video-link>span:last-child {
+      margin-left: auto
+    }
+
+    .dash-play {
+      background: #182A43;
+      color: #E5B75C;
+      padding: 12px;
+      border-radius: 50%
+    }
+
+    @media(max-width:360px) {
+      nav button {
+        font-size: 9px
+      }
+
+      .dash-metric strong {
+        font-size: 23px
+      }
+    }
+
+    /* WTWT refined dashboard components */
+    .dash-intro h1 {
+      font-size: clamp(32px, 8.4vw, 45px);
+      line-height: 1.06;
+      letter-spacing: -.055em
+    }
+
+    .card label {
+      display: block;
+      margin: 13px 0 8px;
+      font-size: 12px;
+      font-weight: 750;
+      color: #4E6178
+    }
+
+    .card input:not([type=checkbox]),
+    .card select,
+    .card textarea {
+      display: block;
+      width: 100%;
+      min-height: 45px;
+      border: 1px solid #DFE6EE !important;
+      border-radius: 12px !important;
+      background: #F7F9FC !important;
+      color: #182A43 !important;
+      padding: 11px 13px !important;
+      font: inherit;
+      font-size: 14px;
+      outline: none
+    }
+
+    .card input:focus,
+    .card select:focus {
+      border-color: #8FAAC9 !important;
+      box-shadow: 0 0 0 3px #AABBD130
+    }
+
+    .card input[type=checkbox] {
+      width: auto;
+      min-height: 0;
+      display: inline-block
+    }
+
+    .card label:has(input[type=checkbox]) {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin: 7px 6px 7px 0;
+      font-weight: 500
+    }
+
+    .section-kicker {
+      font-size: 10px;
+      font-weight: 850;
+      letter-spacing: .15em;
+      color: #8192A7;
+      margin-bottom: 7px
+    }
+
+    .club-tile-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 11px;
+      margin: 14px 16px
+    }
+
+    .club-tile {
+      min-height: 142px;
+      background: #fff;
+      border: 1px solid #E0E6EF;
+      border-radius: 18px;
+      text-align: left;
+      padding: 17px 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      position: relative;
+      color: #182A43;
+      gap: 6px;
+      box-shadow: 0 3px 14px #182a4305
+    }
+
+    .club-tile-icon {
+      display: grid;
+      place-items: center;
+      background: #E8EDF3;
+      border-radius: 12px;
+      width: 35px;
+      height: 35px;
+      font-size: 21px;
+      margin-bottom: 7px
+    }
+
+    .club-tile b {
+      font-size: 15px
+    }
+
+    .club-tile small {
+      color: #78879A;
+      font-size: 11px
+    }
+
+    .tile-arrow {
+      position: absolute;
+      right: 15px;
+      top: 16px;
+      font-size: 16px
+    }
+
+    .club-signup-link {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #182A43;
+      color: #fff;
+      margin: 12px 16px;
+      width: calc(100% - 32px);
+      padding: 17px 18px;
+      border-radius: 15px
+    }
+
+    .profile-edit-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3px 12px
+    }
+
+    .profile-edit-grid label {
+      min-width: 0
+    }
+
+    .application-link {
+      width: 100%;
+      text-align: left;
+      background: transparent;
+      border-bottom: 1px solid #E1E6EC;
+      border-radius: 0;
+      color: #182A43;
+      display: flex;
+      justify-content: space-between;
+      padding: 16px 0;
+      font-size: 14px
+    }
+
+    .match-history-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 0;
+      border-bottom: 1px solid #E9EDF2;
+      font-size: 12px;
+      gap: 8px
+    }
+
+    .match-history-row b {
+      color: #182A43
+    }
+
+    .match-history-row small {
+      color: #778598
+    }
+
+    #drawAdminResult .item,
+    #drawPublished .item {
+      border: 1px solid #E1E6EC;
+      border-radius: 14px;
+      margin: 9px 0;
+      padding: 13px;
+      background: #F8FAFC
+    }
+
+    #drawStats {
+      line-height: 1.9;
+      background: #F8FAFC;
+      border-radius: 12px;
+      padding: 12px
+    }
+
+    @media(max-width:360px) {
+      .profile-edit-grid {
+        grid-template-columns: 1fr
+      }
+    }
+
+    /* In-app back navigation */
+    header .wtwt-back {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 35px;
+      width: 35px;
+      height: 35px;
+      padding: 0;
+      border: 1px solid #DDE4EB;
+      border-radius: 12px;
+      background: #fff;
+      color: #182A43;
+      font-size: 23px;
+      font-weight: 500;
+      box-shadow: 0 2px 6px #182a4308
+    }
+  </style>
+  <style>
+    .wtwt-session-date {
+      display: block;
+      width: 100%;
+      padding: 14px 42px 14px 16px;
+      border: 1px solid #D7E0EA;
+      border-radius: 14px;
+      background: #F4F7FB;
+      color: #182A43;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      appearance: auto
+    }
+
+    .wtwt-session-date:focus {
+      outline: 2px solid #E5B75C;
+      outline-offset: 2px
+    }
+  </style>
+  <style>
+    .play-switch {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 7px;
+      margin: 16px 0
+    }
+
+    .play-switch button {
+      font-size: 13px;
+      padding: 12px 5px;
+      background: #e8edf3;
+      color: #182a43
+    }
+
+    .play-switch button.active {
+      background: #182a43;
+      color: white
+    }
+
+    .play-match {
+      background: #f4f7fb;
+      border: 1px solid #e0e7ef;
+      border-radius: 15px;
+      padding: 14px;
+      margin: 10px 0
+    }
+
+    .play-match .teams {
+      font-weight: 700;
+      line-height: 1.8;
+      margin: 7px 0
+    }
+
+    .play-match .meta {
+      font-size: 12px;
+      color: #61758e
+    }
+
+    .play-match input {
+      width: 66px;
+      padding: 9px;
+      border: 1px solid #ccd7e5;
+      border-radius: 9px;
+      text-align: center;
+      font-weight: 700
+    }
+
+    .play-score-line {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 9px 0
+    }
+
+    .play-match button {
+      background: #182a43;
+      color: white
+    }
+
+    .play-empty {
+      padding: 20px 10px;
+      color: #68778b;
+      text-align: center;
+      font-size: 13px
+    }
+  </style>
+  <style>
+    #wtwtAuthGate {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      background: #f8f6f2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow: auto
+    }
+
+    #wtwtAuthGate[hidden] {
+      display: none !important
+    }
+
+    .auth-panel {
+      width: min(100%, 420px);
+      background: white;
+      border: 1px solid #dce4ed;
+      border-radius: 24px;
+      padding: 26px;
+      box-shadow: 0 15px 50px #182a4315;
+      color: #182a43
+    }
+
+    .auth-panel h1 {
+      font-size: 24px;
+      margin: 8px 0
+    }
+
+    .auth-panel p {
+      font-size: 13px;
+      color: #63738a;
+      line-height: 1.6
+    }
+
+    .auth-panel input {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      margin: 10px 0;
+      border: 1px solid #d9e2ee;
+      border-radius: 12px;
+      background: #f5f7fa;
+      box-sizing: border-box
+    }
+
+    .auth-panel button {
+      width: 100%;
+      padding: 13px;
+      margin-top: 8px;
+      border-radius: 12px;
+      border: 0;
+      background: #182a43;
+      color: white;
+      font-weight: 700
+    }
+
+    .auth-panel button.secondary {
+      background: #e8edf3;
+      color: #182a43
+    }
+
+    #authStatus {
+      min-height: 20px
+    }
+
+    .wtwt-signout {
+      font-size: 11px !important;
+      padding: 7px !important;
+      width: auto !important;
+      background: #e8edf3 !important;
+      color: #182a43 !important;
+      border-radius: 10px !important
+    }
+  </style>
+</head>
+
+<body>
+  <div id="wtwtAuthGate">
+    <div class="auth-panel">
+      <div style="font-weight:900;letter-spacing:2px">WTWT ★ TENNIS CLUB</div>
+      <h1 id="authTitle">회원 로그인</h1>
+      <p>이메일로 가입하고 인증한 뒤 운영진 승인을 받아주세요.</p><input id="authEmail" type="email" autocomplete="email"
+        placeholder="이메일"><input id="authPassword" type="password" autocomplete="current-password"
+        placeholder="비밀번호 (6자 이상)"><input id="authName" type="text" placeholder="이름 (가입 시 입력)"
+        style="display:none"><button id="authMain" onclick="wtwtAuthSubmit()">로그인</button><button class="secondary"
+        onclick="wtwtAuthToggle()" id="authToggle">회원가입하기</button><button class="secondary"
+        onclick="wtwtAuthReset()">비밀번호 재설정 메일 받기</button>
+      <p id="authStatus" role="status"></p>
+    </div>
+  </div>
+  <div class="app">
+    <header><button id="wtwtBack" class="wtwt-back" onclick="wtwtGoBack()" aria-label="뒤로 가기"
+        title="뒤로 가기">←</button><img class="logo" src="assets/wtwt-logo-original.jpg"><b>WTWT CLUB</b><button
+        id="authLogout" class="wtwt-signout" style="display:none;margin-left:auto"
+        onclick="wtwtAuthSignOut()">로그아웃</button><button id="guestPreviewToggle" onclick="wtwtToggleGuest()"
+        style="margin-left:auto;font-size:11px;background:#fff;border:1px solid #e7e0d5;color:#07583f;padding:7px;border-radius:9px">게스트
+        화면 보기</button></header>
+    <section id="home" class="page on dashboard-home">
+      <div class="dash-intro">
+        <div class="dash-eyebrow">WTWT · TENNIS CLUB</div>
+        <h1>We Tennis<br>Winning Tennis</h1>
+        <p>WE TENNIS ★ WINNING TENNIS</p>
+      </div>
+      <div class="dash-section-label">THIS WEEK <span>월 · 수 · 토 · 일</span></div>
+      <div class="dash-metrics" id="homeAttendanceGrid">
+        <div class="dash-metric dash-dark"><small>월요일 출석</small><strong id="homeMon">0 / 16</strong><span>MONDAY</span>
+        </div>
+        <div class="dash-metric dash-yellow"><small>수요일 출석</small><strong id="homeWed">0 /
+            16</strong><span>WEDNESDAY</span></div>
+        <div class="dash-metric"><small>토요일 출석</small><strong id="homeSat">0 / 16</strong><span>SATURDAY</span></div>
+        <div class="dash-metric"><small>일요일 출석</small><strong id="homeSun">0 / 16</strong><span>SUNDAY</span></div>
+      </div>
+      <div class="dash-action-row"><button onclick="go('attendance');renderAttendance()">출석 신청
+          <span>↗</span></button><button onclick="go('play');drawRefresh()">대진표 보기 <span>↗</span></button></div>
+      <div class="card dash-schedule" id="weeklyScheduleCard">
+        <div class="row"><b>정기모임 일정</b><span class="chip">SCHEDULE</span></div>
+        <div id="weeklySchedulePublic" class="muted">등록된 일정이 없습니다.</div>
+      </div>
+      <div class="card dash-youtube">
+        <div class="row"><b>WTWT MATCH VIDEO</b><span class="chip">YOUTUBE</span></div><a class="dash-video-link"
+          href="https://youtube.com/@wtwt-vn" target="_blank" rel="noopener noreferrer"><span
+            class="dash-play">▶</span><span>우리의 경기 영상 보러가기</span><span>↗</span></a>
+      </div>
+      <div class="card dash-notice">
+        <div class="row"><b>CLUB NOTICE</b><span class="chip">WTWT</span></div>
+        <div class="item">정기모임과 게스트 신청은 운영진 공지를 확인해 주세요.</div><button class="soft" onclick="go('club')">클럽 안내 보기
+          →</button>
+      </div>
+    </section>
+    <section id="attendance" class="page">
+      <div class="hero"><small>WTWT ATTENDANCE</small>
+        <h2>출석 신청 · 확인</h2>
+        <p>시간 제한 없이 선착순 16명 · 취소 시 자리 자동 재오픈</p>
+      </div>
+      <div class="card"><label>모임 날짜 <select id="attDate" onchange="renderAttendance()" class="wtwt-session-date"
+            aria-label="정기 모임 날짜 선택"></select></label>
+        <div id="attSummary" class="item"></div>
+        <div id="attIdentity" class="item"></div>
+        <div id="attAction" class="item"></div>
+        <div id="attRoundPref" class="item"></div>
+        <h3>출석 확인</h3>
+        <div id="attList"></div>
+      </div>
+    </section>
+    <section id="play" class="page">
+      <div class="card">
+        <div class="section-kicker">WTWT MATCH CENTER</div>
+        <h2>🎾 PLAY · 경기 대진</h2>
+        <p class="muted">내 경기부터 전체 대진, 점수까지 한 곳에서 확인하세요.</p><label>모임 날짜 <input type="date" id="drawDate"
+            onchange="drawRefresh()" style="width:100%;padding:10px"></label>
+        <div class="play-switch"><button class="active" onclick="playSwitch('mine',this)">내 대진</button><button
+            onclick="playSwitch('all',this)">전체 대진</button><button onclick="playSwitch('score',this)">점수 입력</button>
+        </div>
+        <div id="playMine" class="play-panel"></div>
+        <div id="playAll" class="play-panel" style="display:none"></div>
+        <div id="playScore" class="play-panel" style="display:none"></div>
+      </div>
+      <div class="card">
+        <h3>선수별 파트너 · 상대 기록</h3><label>선수 선택<select id="drawStatsPlayer" onchange="drawRenderStats()">
+            <option value="">선수 선택</option>
+          </select></label>
+        <div id="drawStats" class="item muted"></div>
+      </div>
+      <div id="drawPublished" style="display:none"></div>
+    </section>
+
+    <section id="apply" class="page">
+      <div class="card">
+        <h2>신청하기</h2>
+        <div class="item">👕 티셔츠 / 물품 신청</div><button class="application-link"
+          onclick="go('partnerBoard');renderPartnerBoard()">🏆 외부대회 파트너 찾기 <span>↗</span></button>
+        <div class="item">💗 기부 / 찬조 신청 <span class="muted">금액·물품 직접 등록</span></div>
+        <div class="item">🎉 회식 / 번개 참석</div>
+      </div>
+      <div class="card"><b>게스트 신청</b>
+        <p class="muted">클럽명 드롭다운 · 시작년월 또는 구력 선택 · 전체 경기 촬영 및 YouTube 게시 동의</p>
+        <div id="guestApplyPanel"><label>참가 요일<select id="guestDay"
+              onchange="document.getElementById('guestDate').value='';renderGuestSignup()">
+              <option>월</option>
+              <option>수</option>
+              <option>토</option>
+              <option>일</option>
+            </select></label><label>참가 날짜<select id="guestDate" onchange="renderGuestSignup()"></select></label>
+          <div id="guestAvailability" class="item muted"></div>
+          <div id="guestForm" style="display:none"><input id="guestName" placeholder="이름"><select id="guestGender">
+              <option value="">성별 선택</option>
+              <option>남</option>
+              <option>여</option>
+            </select><input id="guestStarted" type="month" aria-label="테니스 시작 연월"><input id="guestClub"
+              placeholder="소속 클럽 (선택)"><label><input id="guestConsent" type="checkbox"> 경기 촬영 및 영상 게시 동의</label><button
+              class="green" onclick="submitGuest()">게스트 신청 완료</button></div>
+          <div id="guestPayment" class="item" style="display:none"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="partnerBoard" class="page">
+      <div class="card">
+        <div class="section-kicker">WTWT MATCH PARTNER</div>
+        <h2>대회 파트너 찾기</h2>
+        <p class="muted">외부대회 참가를 위한 클럽 내 파트너 모집입니다. WTWT 자체 대회 신청과 별개예요.</p><label>대회 이름<input id="partnerEvent"
+            placeholder="대회명"></label><label>대회 날짜<input id="partnerEventDate" type="date"></label><label>모집 글<input
+            id="partnerMemo" placeholder="희망 부문 · 참고사항"></label><button class="green" onclick="postPartnerRequest()">파트너
+          모집 올리기</button>
+      </div>
+      <div class="card">
+        <h3>파트너 모집 게시판</h3>
+        <div id="partnerBoardList"></div>
+        <p class="muted">신청자 명단은 모집자에게만 보여야 하므로, 실제 비공개 처리는 로그인·서버 권한 연결 후 활성화됩니다. 이 파일은 기능 시연용입니다.</p>
+      </div>
+    </section>
+    <section id="club" class="page">
+      <div class="card">
+        <span class="chip">ABOUT WTWT</span>
+        <h2 style="margin-top:12px">WE TENNIS ★ WINNING TENNIS</h2>
+        <div class="muted">SINCE 2026</div>
+        <p>혼자보다 함께 할 때 더 즐거운 테니스. 즐겁게 치다보면 어느 새 한단계 더 성장하는 테니스</p>
+      </div>
+
+      <div class="club-tile-grid">
+        <button class="club-tile" onclick="go('memberDirectory')"><span
+            class="club-tile-icon">♙</span><b>회원명부</b><small>회원 · 구력 · 등록 요일</small><span
+            class="tile-arrow">↗</span></button>
+        <button class="club-tile" onclick="clubPanel('클럽 소개')"><span class="club-tile-icon">★</span><b>클럽
+            소개</b><small>WTWT 운영 안내</small><span class="tile-arrow">↗</span></button>
+        <button class="club-tile" onclick="clubPanel('공지사항')"><span class="club-tile-icon">◉</span><b>공지사항</b><small>운영
+            공지와 소식</small><span class="tile-arrow">↗</span></button>
+        <button class="club-tile" onclick="clubPanel('대회 / 일정')"><span class="club-tile-icon">▦</span><b>대회 /
+            일정</b><small>클럽 행사 · 외부대회</small><span class="tile-arrow">↗</span></button>
+        <button class="club-tile" onclick="clubPanel('게시판 & 댓글')"><span
+            class="club-tile-icon">✎</span><b>게시판</b><small>클럽 이야기 · 댓글</small><span
+            class="tile-arrow">↗</span></button>
+        <button class="club-tile" onclick="clubPanel('사진첩')"><span class="club-tile-icon">▧</span><b>사진첩</b><small>경기와
+            모임의 순간</small><span class="tile-arrow">↗</span></button>
+      </div>
+    </section>
+    <section id="clubDetail" class="page">
+      <div class="card"><button class="soft" onclick="go('club')">← CLUB</button>
+        <h2 id="clubDetailTitle">클럽 안내</h2>
+        <p class="muted" id="clubDetailBody">운영진이 내용을 등록하면 표시됩니다.</p>
+      </div>
+    </section>
+    <section id="memberSignup" class="page">
+      <div class="card">
+        <h2>🎾 WTWT 회원 가입 신청</h2>
+        <p class="muted">본인이 직접 작성해 주세요. 운영진 승인 후 회원명부에 등록됩니다.</p>
+        <label>이름 *<input id="signupName" maxlength="40" placeholder="성함" style="width:100%;padding:10px"></label>
+        <label>성별 *<select id="signupGender" style="width:100%;padding:10px">
+            <option value="">선택</option>
+            <option>남</option>
+            <option>여</option>
+          </select></label>
+        <label>테니스 시작일 *<input id="signupStart" type="date" style="width:100%;padding:10px"></label>
+        <label>전화번호 * (운영진 확인용)<input id="signupPhone" type="tel" maxlength="30" placeholder="연락처"
+            style="width:100%;padding:10px"></label>
+        <label>카카오 ID (선택)<input id="signupKakao" maxlength="60" placeholder="카카오톡 ID"
+            style="width:100%;padding:10px"></label>
+        <div class="item"><b>등록 요일 *</b>
+          <div id="signupDays" style="display:flex;gap:14px;flex-wrap:wrap"><label><input type="checkbox" value="월">
+              월</label><label><input type="checkbox" value="수"> 수</label><label><input type="checkbox" value="토">
+              토</label><label><input type="checkbox" value="일"> 일</label></div>
+        </div>
+        <p class="muted">주 1회 700,000 VND / 주 2~4회 1,500,000 VND · 입단비 1,000,000 VND (티셔츠 제공)</p>
+        <button class="green" onclick="submitMemberSignup()">가입 신청하기</button>
+        <div id="signupMessage" class="muted" aria-live="polite"></div>
+        <p class="muted">이메일 인증 후 로그인한 상태에서 신청해 주세요. 신청 정보는 서버에 저장되며 운영진 승인 후 회원명부에 표시됩니다.</p>
+      </div>
+    </section>
+    <section id="memberDirectory" class="page">
+      <div class="card">
+        <h2>회원명부 · 테니스 구력</h2>
+        <p class="muted">회원끼리 이름, 구력, 등록 요일을 볼 수 있어요. 연락처와 카카오 ID는 표시하지 않습니다.</p>
+        <div id="publicMemberList"></div>
+      </div>
+    </section>
+    <section id="my" class="page">
+      <div class="card">
+        <div class="row" style="align-items:center">
+          <h2 style="margin:0">MY · 내 구력</h2><button class="soft"
+            style="width:auto;padding:8px 12px;font-size:12px;border-radius:20px"
+            onclick="document.getElementById('myEditPanel').hidden=!document.getElementById('myEditPanel').hidden;loadMyProfile()">✎
+            프로필 수정</button>
+        </div>
+        <div id="myMemberProfile" class="muted" style="margin-top:12px">본인 프로필 설정 후 구력 확인</div>
+        <div id="myEditPanel" hidden style="margin-top:14px">
+          <div class="profile-edit-grid"><label>이름<input id="editMyName" placeholder="이름"></label><label>테니스 시작일<input
+                id="editMyStart" type="date"></label><label>전화번호<input id="editMyPhone" type="tel"></label><label>카카오
+              ID<input id="editMyKakao"></label></div><button type="button" class="green" onclick="saveMyProfile()">저장하기</button>
+          <p class="muted" id="myProfileMessage" aria-live="polite"></p>
+        </div>
+      </div>
+      <div class="card"><b>내 기록</b>
+        <div class="grid" style="margin-top:10px">
+          <div class="kpi" style="background:#f2eee7">누적 경기<br><b>38</b></div>
+          <div class="kpi" style="background:#f2eee7">승률<br><b>58%</b></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="row">
+          <div><b>월 회비</b>
+            <div class="muted">등록 주 1회 700,000 / 주 2~4회 1,500,000 VND</div>
+          </div><span class="chip">입금확인 전</span>
+        </div>
+      </div>
+      <div class="card"><b>내 활동</b>
+        <div class="item row">
+          <div><b>내가 쓴 글</b>
+            <div class="muted">게시판 · 후기 · 사진글</div>
+          </div><span>›</span>
+        </div>
+        <div class="item row">
+          <div><b>내가 쓴 댓글</b>
+            <div class="muted">내 댓글 모아보기</div>
+          </div><span>›</span>
+        </div>
+      </div>
+      <div class="card"><b>공지 읽음 여부</b>
+        <div class="item row"><span>9월 운영 변경</span><span>읽음 ✓</span></div>
+        <div class="item row"><span>클럽대회 안내</span><span class="pink">NEW</span></div>
+      </div>
+    </section>
+    <section id="admin" class="page">
+      <div class="hero">
+        <div class="muted">임원진 전용</div>
+        <h1>ADMIN</h1>
+        <div class="grid">
+          <div class="kpi">등록 회원<br><b id="memberCount">0</b></div>
+          <div class="kpi">월요일<br><b id="countMon">0</b></div>
+          <div class="kpi">수요일<br><b id="countWed">0</b></div>
+          <div class="kpi">토요일<br><b id="countSat">0</b></div>
+          <div class="kpi">일요일<br><b id="countSun">0</b></div>
+        </div>
+      </div>
+      <div class="tabs"><button class="sel" onclick="tab('d',this)">🎾 대진</button><button
+          onclick="tab('m',this)">회원</button><button onclick="tab('r',this)">결과</button><button
+          onclick="tab('g',this)">게스트</button><button onclick="tab('u',this)">회비</button><button
+          onclick="tab('b',this)">회계</button><button onclick="tab('c',this)">공지/신청</button></div>
+      <div id="m" class="sec">
+        <div class="card">
+          <h2>신규 가입 신청 · 승인 대기</h2>
+          <p class="muted">가입자가 직접 입력한 내용을 확인한 뒤 승인하면 회원명부에 등록됩니다. 등급은 운영진이 추후 지정합니다.</p>
+          <div id="signupPendingList"></div>
+        </div>
+        <div class="card">
+          <b>회원 구성</b>
+          <div class="item">운영일: 월 · 수 · 토 · 일</div>
+          <div class="item">주 1회 700,000 VND / 주 2~4회 1,500,000 VND</div>
+          <div class="item">신규 입단비 1,000,000 VND · 납부 시 티셔츠 제공</div>
+        </div>
+        <div class="card">
+          <div class="row">
+            <div><b>회원 기본정보</b>
+              <div class="muted">운영진만 수정 가능 · 자동 저장</div>
+            </div><span class="chip">MEMBER DB</span>
+          </div>
+          <div class="item"><b>신규 회원 등록 · 회비 및 입단비 관리</b>
+            <p class="muted">등록 요일을 선택하면 월 회비가 자동 계산됩니다. 입단비 납부 여부와 티셔츠 지급 여부는 별도 관리합니다.</p>
+            <input id="newMemberName" placeholder="신규 회원 이름"
+              style="width:100%;padding:10px;margin:6px 0;border:1px solid #ddd;border-radius:10px">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+              <select id="newMemberRole">
+                <option>회원</option>
+                <option>회장</option>
+                <option>총무</option>
+                <option>경기이사</option>
+                <option>운영위원</option>
+              </select>
+              <select id="newMemberGender">
+                <option value="">성별</option>
+                <option>남</option>
+                <option>여</option>
+              </select>
+              <label>테니스 시작일<input id="newMemberStart" type="date" style="width:100%"></label>
+              <select id="newMemberGrade">
+                <option value="">등급</option>
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+                <option>6</option>
+                <option>7</option>
+                <option>8</option>
+                <option>9</option>
+              </select>
+              <input id="newMemberPhone" placeholder="전화번호 (비공개)"><input id="newMemberKakao" placeholder="카카오 ID (비공개)">
+            </div>
+            <div style="display:flex;gap:14px;flex-wrap:wrap;margin:8px 0" id="newMemberDays"><label><input
+                  type="checkbox" value="월"> 월</label><label><input type="checkbox" value="수"> 수</label><label><input
+                  type="checkbox" value="토"> 토</label><label><input type="checkbox" value="일"> 일</label></div>
+            <button class="green" onclick="addWtwtMember()">+ 회원 등록</button>
+            <div id="memberRegisterMessage" class="muted" aria-live="polite"></div>
+          </div>
+          <div id="wtwtMemberList"></div>
+          <p class="muted">등급은 1급이 가장 낮고 9급이 가장 높음. 여기 저장된 성별/등급을 대진 생성 시 자동 사용.</p>
+        </div>
+      </div>
+      <div id="d" class="sec sel">
+        <div class="card">
+          <h2>🎾 대진 상세 설정 · 생성</h2>
+          <p class="muted">출석 신청자를 불러와서 균등 배정합니다. 게스트 포함 및 2라운드 합류, 우선 파트너, 누적게임 보정을 설정할 수 있습니다.</p><label>날짜<input
+              type="date" id="adminDrawDate" onchange="drawRefresh()" style="width:100%;padding:10px"></label>
+          <div id="drawParticipants" class="item"></div>
+          <div class="item"><b>이번 달 회원별 누적 게임수</b>
+            <div class="muted">같은 요일별 기록을 우선 비교해 적게 뛴 회원에게 다음 대진 우선권을 줍니다.</div>
+            <div id="drawMonthlyCounts"></div>
+          </div>
+          <div class="item"><b>운영진 매칭 현황</b>
+            <p class="muted">선택한 날짜 이전 확정 대진의 파트너·상대 반복 횟수 (요일별 전체 누적)</p>
+            <div id="adminMatchOverview"></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><label>라운드 수<input type="number"
+                id="drawRounds" min="1" max="12" value="4" style="width:100%"></label><label>코트 수<input type="number"
+                id="drawCourtCount" min="1" max="6" value="2" style="width:100%"></label><label>1시간차 코트<input
+                id="drawCourtsFirst" value="4,6" style="width:100%"></label><label>2시간차 코트<input id="drawCourtsSecond"
+                value="5,6" style="width:100%"></label><label>2시간차 시작 라운드<input type="number" id="drawSwitchRound"
+                min="2" value="3" style="width:100%"></label><label>급수 균형 강도<select id="drawBalance">
+                <option value="1">보통</option>
+                <option value="2">강하게</option>
+                <option value="0">무작위</option>
+              </select></label></div><label><input type="checkbox" id="drawGuestFrom2" checked> 게스트 2라운드부터
+            참여</label><label><input type="checkbox" id="drawAvoidRepeat" checked> 같은 파트너/상대 반복 최소화</label><label><input
+              type="checkbox" id="drawAvoidDoubleRest" checked> 연속 휴식 방지</label><label><input type="checkbox"
+              id="drawCumulative" checked> 이전 누적 게임수 적은 회원 우선</label><label><input type="checkbox" id="drawFirstAll"
+              checked> 가능하면 1라운드 전원 출전</label>
+          <div class="item"><b>복식 구성</b><label>경기 부문<select id="drawGenderMode">
+                <option value="mixed">혼복 포함 · 자유 복식</option>
+                <option value="women">여복만</option>
+                <option value="men">남복만</option>
+                <option value="same">여복 / 남복 각각 편성</option>
+              </select></label><small class="muted">회원·게스트의 성별 정보가 필요합니다. 인원이 부족한 부문은 생성되지 않습니다.</small></div>
+          <div class="item"><b>우선 파트너 조건</b><label>우선 파트너 A (출석자 명단)<select id="drawPartnerA"></select></label><label>우선
+              파트너 B (출석자 명단)<select id="drawPartnerB"></select></label><label>적용 강도<select id="drawPartnerStrength">
+                <option value="hard">강도 고정</option>
+                <option value="strong">강하게</option>
+                <option value="normal" selected>보통</option>
+                <option value="weak">약하게</option>
+              </select></label></div>
+          <div class="item"><b>피해야 하는 조합</b><label>선수 A<select id="drawAvoidA"></select></label><label>선수 B<select
+                id="drawAvoidB"></select></label><label>피할 관계<select id="drawAvoidType">
+                <option value="partner">파트너로 만나지 않기</option>
+                <option value="opponent">상대방으로 만나지 않기</option>
+                <option value="both">파트너·상대 모두 피하기</option>
+              </select></label><button class="soft" onclick="drawAddAvoid()">+ 피해야 할 조합 추가</button>
+            <div id="drawAvoidList" class="muted"></div>
+          </div>
+          <div class="item"><b>늦게 오는 회원</b>
+            <p class="muted">선수별 첫 출전 라운드를 지정하세요. 출석 시 회원이 입력한 값도 자동 반영됩니다.</p><label>선수<select
+                id="drawLatePlayer"></select></label><label>첫 출전 라운드<input id="drawLateRound" type="number" min="1"
+                max="12" value="2"></label><button class="soft" onclick="drawAddLate()">+ 첫 라운드 지정</button>
+            <div id="drawLateList" class="muted"></div>
+          </div>
+          <div class="item"><b>일찍 가는 회원</b>
+            <p class="muted">선수별 마지막 출전 라운드를 지정하세요.</p><label>선수<select id="drawEarlyPlayer"></select></label><label>마지막
+              출전 라운드<input id="drawEarlyRound" type="number" min="1" max="12" value="2"></label><button class="soft"
+              onclick="drawAddEarly()">+ 마지막 라운드 지정</button>
+            <div id="drawEarlyList" class="muted"></div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin:12px 0"><button class="green"
+              onclick="drawGenerate()">대진 생성 / 재추첨</button><button class="soft" onclick="drawSaveFinal()">FINAL
+              확정</button><button class="soft" onclick="drawUnlock()">확정 해제</button></div>
+          <div id="drawAdminResult"></div>
+          <p class="muted">임시 대진에서는 선수 4명과 코트를 직접 바꿀 수 있습니다. 선수 중복과 라운드 제한을 확인한 뒤 FINAL 확정하세요.</p>
+          <p class="muted">수동 수정 후 FINAL 확정 시 PLAY에 게시됩니다. 이 미리보기의 게시 정보는 같은 브라우저에만 표시됩니다.</p>
+        </div>
+      </div>
+      <div id="r" class="sec">
+        <div class="card"><b>경기 결과</b>
+          <div class="item row"><span>미입력 경기</span><b class="pink">3</b></div>
+          <div class="item row"><span>완료 경기</span><b>9</b></div>
+          <p class="muted">회원 입력 점수는 임원진이 수정 가능</p>
+        </div>
+      </div>
+      <div id="g" class="sec">
+        <div class="card">
+          <h2>게스트 신청 개방 설정</h2>
+          <p class="muted">기본 닫힘 · 운영진이 요일별 개방 버튼을 켠 경우에만 게스트 신청 가능 · 16명 정원 자동 마감</p>
+          <div id="guestAdminControls"></div>
+          <p class="muted">※ 시안의 ADMIN은 아직 로그인 보호가 없습니다. 실제 운영 전 권한 인증이 필요합니다.</p>
+        </div>
+        <div class="card">
+          <h2>게스트비 · 입금 계좌 설정</h2><input id="guestFee" type="number" placeholder="게스트비 (VND)"><input id="guestBank"
+            placeholder="은행명"><input id="guestAccount" placeholder="계좌번호"><input id="guestHolder"
+            placeholder="예금주"><button class="green" onclick="saveGuestPayment()">안내 정보 저장</button>
+        </div>
+        <div class="card">
+          <h2>게스트 신청 현황</h2>
+          <div id="guestAdminList"></div>
+        </div>
+        <div class="card">
+          <div class="row">
+            <div><b>게스트 DB</b>
+              <div class="muted">운영진만 성별/등급 수정 가능 · 자동 저장</div>
+            </div><span class="chip">GUEST DB</span>
+          </div>
+          <table>
+            <tr>
+              <th>이름</th>
+              <th>성별</th>
+              <th>등급</th>
+              <th>시작년월</th>
+              <th>클럽</th>
+              <th>방문</th>
+            </tr>
+            <tr>
+              <td>이서연</td>
+              <td><select data-key="guest_lee_gender" onchange="saveProfile(this)">
+                  <option selected>여</option>
+                  <option>남</option>
+                </select></td>
+              <td><select data-key="guest_lee_grade" onchange="saveProfile(this)">
+                  <option>1</option>
+                  <option>2</option>
+                  <option>3</option>
+                  <option selected>4</option>
+                  <option>5</option>
+                  <option>6</option>
+                  <option>7</option>
+                  <option>8</option>
+                  <option>9</option>
+                </select></td>
+              <td>2023-03</td>
+              <td>ABC</td>
+              <td>4</td>
+            </tr>
+            <tr>
+              <td>최민수</td>
+              <td><select data-key="guest_choi_gender" onchange="saveProfile(this)">
+                  <option>여</option>
+                  <option selected>남</option>
+                </select></td>
+              <td><select data-key="guest_choi_grade" onchange="saveProfile(this)">
+                  <option>1</option>
+                  <option>2</option>
+                  <option>3</option>
+                  <option>4</option>
+                  <option selected>5</option>
+                  <option>6</option>
+                  <option>7</option>
+                  <option>8</option>
+                  <option>9</option>
+                </select></td>
+              <td>2021-08</td>
+              <td>Tennis Lab</td>
+              <td>2</td>
+            </tr>
+          </table>
+          <p class="muted">한 번 입력한 성별·등급·시작년월·클럽 정보는 다음 방문에도 그대로 불러오고, 최근 방문일/방문횟수만 갱신.</p>
+        </div>
+      </div>
+      <div id="u" class="sec">
+        <div class="card">
+          <h2>회원별 회비 입금 확인</h2>
+          <p class="muted">입금 내역을 확인한 후 운영진이 직접 납부 완료를 표시합니다.</p><label>대상 월 <input id="duesMonth" type="month"
+              onchange="renderDuesAdmin()"></label>
+          <div id="duesMemberList"></div>
+          <div id="duesMemberSummary" class="item"></div>
+        </div>
+        <div class="card">
+          <h2>게스트비 입금 확인</h2>
+          <div id="duesGuestList"></div>
+        </div>
+      </div>
+      <div id="b" class="sec">
+        <div class="card"><b>회계장부</b>
+          <div class="grid" style="margin-top:10px">
+            <div class="kpi" style="background:#f2eee7">수입<br><b>12.0M</b></div>
+            <div class="kpi" style="background:#f2eee7">지출<br><b>7.4M</b></div>
+            <div class="kpi" style="background:#f2eee7">잔액<br><b>4.6M</b></div>
+            <div class="kpi" style="background:#f2eee7">운영<br><b>월/수/토/일</b></div>
+          </div>
+          <table style="margin-top:10px">
+            <tr>
+              <th>날짜</th>
+              <th>구분</th>
+              <th>항목</th>
+              <th>수입</th>
+              <th>지출</th>
+            </tr>
+            <tr>
+              <td>9/5</td>
+              <td>토</td>
+              <td>회비</td>
+              <td>500k</td>
+              <td>-</td>
+            </tr>
+            <tr>
+              <td>9/5</td>
+              <td>일</td>
+              <td>코트</td>
+              <td>-</td>
+              <td>800k</td>
+            </tr>
+          </table><button class="green" style="margin-top:10px">+ 장부 입력</button>
+        </div>
+      </div>
+      <div id="c" class="sec">
+        <div class="card" id="scheduleAdmin">
+          <div class="row"><b>📅 요일별 모임 시간 · 코트 공지</b><span class="chip">운영진 입력</span></div>
+          <p class="muted">요일별 시간과 코트를 입력하고 저장하면 HOME 공지에 표시됩니다. 정해지지 않은 항목은 비워두세요.</p>
+          <div id="weeklyScheduleEditor"></div><button class="green" style="margin-top:10px"
+            onclick="saveWeeklySchedule()">시간 · 코트 공지 저장</button>
+          <div id="weeklyScheduleMessage" class="muted" aria-live="polite"></div>
+        </div>
+        <div class="card"><b>공지 / 일정 / 신청창</b><button class="green" style="margin-top:10px">+ 새 공지</button><button
+            class="soft" style="width:100%;margin-top:7px">+ 티셔츠/물품 신청창</button><button class="soft"
+            style="width:100%;margin-top:7px">+ 대회 참가 신청창</button><button class="soft"
+            style="width:100%;margin-top:7px">+ 기부/찬조 신청창</button></div>
+      </div>
+    </section>
+    <nav>
+      <button class="sel" onclick="go('home',this)">HOME</button>
+      <button onclick="go('attendance',this);renderAttendance()">출석</button><button
+        onclick="go('play',this)">PLAY</button>
+      <button onclick="go('club',this)">CLUB</button>
+      <button onclick="go('apply',this)">신청</button>
+      <button onclick="go('my',this)">MY</button>
+      <button onclick="go('admin',this)">ADMIN</button>
+    </nav>
+  </div>
+  <script>let wtwtCurrentPage = 'home';
+    let wtwtPageStack = [];
+    function wtwtGoBack() { if (wtwtPageStack.length) { const previous = wtwtPageStack.pop(); go(previous, null, true) } else { go('home', null, true) } }
+    function wtwtUpdateBack() { const btn = document.getElementById('wtwtBack'); if (btn) btn.style.display = (wtwtCurrentPage === 'home' && !wtwtPageStack.length) ? 'none' : 'inline-flex' }
+    function go(i, b, back = false) { if (!document.getElementById(i)) return; if (window.wtwtRole) { if (window.wtwtRole === 'pending' && i !== 'memberSignup') return; if (i === 'admin' && !['admin', 'super_admin'].includes(window.wtwtRole)) return; if (window.wtwtRole === 'guest' && !['home', 'play', 'apply'].includes(i)) return; } if (i !== wtwtCurrentPage && !back) { wtwtPageStack.push(wtwtCurrentPage); if (wtwtPageStack.length > 30) wtwtPageStack.shift() } wtwtCurrentPage = i; wtwtUpdateBack(); document.querySelectorAll('.page').forEach(x => x.classList.remove('on')); document.getElementById(i).classList.add('on'); document.querySelectorAll('nav button').forEach(x => x.classList.remove('sel')); if (b) b.classList.add('sel'); else { const nb = [...document.querySelectorAll('nav button')].find(x => x.getAttribute('onclick')?.includes("go('" + i + "'")); if (nb) nb.classList.add('sel') } scrollTo(0, 0) } function tab(i, b) { document.querySelectorAll('.sec').forEach(x => x.classList.remove('sel')); document.getElementById(i).classList.add('sel'); document.querySelectorAll('.tabs button').forEach(x => x.classList.remove('sel')); b.classList.add('sel') } function drawTab(i, b) { document.querySelectorAll('.drawView').forEach(x => x.classList.remove('sel')); document.getElementById(i).classList.add('sel'); b.parentElement.querySelectorAll('button').forEach(x => x.classList.remove('sel')); b.classList.add('sel') }
+    function saveProfile(el) { localStorage.setItem(el.dataset.key, el.value); el.style.outline = '2px solid #ff2d7d'; setTimeout(() => el.style.outline = '', 450) }
+    function loadProfiles() { document.querySelectorAll('[data-key]').forEach(el => { let v = localStorage.getItem(el.dataset.key); if (v !== null) el.value = v }) }
+    window.addEventListener('DOMContentLoaded', loadProfiles);
+
+    const wtwtStorageKey = 'wtwt-club-new-members-v1';
+    let wtwtRosterSource = 'local';
+    function wtwtMembers() { try { return JSON.parse(localStorage.getItem(wtwtStorageKey) || '[]') } catch (e) { return [] } }
+    function wtwtSave(a) { localStorage.setItem(wtwtStorageKey, JSON.stringify(a)); renderWtwtMembers() }
+    function wtwtFee(days) { return days.length === 0 ? 0 : days.length === 1 ? 700000 : 1500000 }
+    function wtwtRowToMember(r) { return { id:r.id, authUserId:r.auth_user_id || null, name:r.display_name, days:r.days || [], role:r.member_type || 'member', gender:r.gender || '', start:r.start_date || '', phone:r.phone || '', kakao:r.kakao || '', grade:r.grade == null ? '' : String(r.grade), joiningPaid:!!r.joining_paid, shirtGiven:!!r.shirt_given, monthlyPaid:!!r.monthly_paid, isActive:r.is_active !== false }; }
+    function wtwtMemberToRow(m) { return { display_name:m.name, days:m.days || [], member_type:m.role || 'member', gender:m.gender || null, start_date:m.start || null, phone:m.phone || null, kakao:m.kakao || null, grade:m.grade === '' || m.grade == null ? null : Number(m.grade), joining_paid:!!m.joiningPaid, shirt_given:!!m.shirtGiven, monthly_paid:!!m.monthlyPaid, is_active:m.isActive !== false }; }
+    async function wtwtLoadServerRoster() {
+      if (!wtwtSB || !['admin','super_admin'].includes(window.wtwtRole)) return false;
+      const {data, error} = await wtwtSB.from('wtwt_members').select('id,auth_user_id,display_name,days,member_type,gender,start_date,phone,kakao,grade,is_active,joining_paid,shirt_given,monthly_paid').order('display_name');
+      if (error) { console.error('서버 회원명부 불러오기 실패:', error.message); return false; }
+      wtwtRosterSource = 'server';
+      wtwtSave((data || []).map(wtwtRowToMember));
+      return true;
+    }
+    async function addWtwtMember() {
+      const name = document.getElementById('newMemberName').value.trim();
+      const days = [...document.querySelectorAll('#newMemberDays input:checked')].map(x => x.value);
+      const msg = document.getElementById('memberRegisterMessage');
+      if (!name || !days.length) { msg.textContent = '이름과 등록 요일을 선택해 주세요.'; return; }
+      if (!wtwtSB || !['admin','super_admin'].includes(window.wtwtRole)) { msg.textContent = '관리자 로그인 후 서버 저장을 사용할 수 있습니다.'; return; }
+      const member = { name, days, role:document.getElementById('newMemberRole').value, gender:document.getElementById('newMemberGender').value, start:document.getElementById('newMemberStart').value, grade:document.getElementById('newMemberGrade').value, phone:document.getElementById('newMemberPhone').value, kakao:document.getElementById('newMemberKakao').value, joiningPaid:false, shirtGiven:false, monthlyPaid:false, isActive:true };
+      msg.textContent = '서버에 저장하는 중…';
+      const {data, error} = await wtwtSB.from('wtwt_members').insert(wtwtMemberToRow(member)).select('id,auth_user_id,display_name,days,member_type,gender,start_date,phone,kakao,grade,is_active,joining_paid,shirt_given,monthly_paid').single();
+      if (error) { msg.textContent = '서버 저장 실패: ' + error.message; return; }
+      const a = wtwtMembers(); a.push(wtwtRowToMember(data)); wtwtSave(a);
+      document.getElementById('newMemberName').value = ''; document.querySelectorAll('#newMemberDays input').forEach(x => x.checked = false);
+      msg.textContent = '회원이 서버에 저장되었습니다.';
+    }
+    async function wtwtUpdate(id, key, value) {
+      const a = wtwtMembers(); const m = a.find(x => x.id === id); if (!m) return;
+      const previous = m[key]; m[key] = value;
+      if (wtwtRosterSource !== 'server' || !wtwtSB) { m[key] = previous; alert('서버 명부가 연결되지 않았습니다. 변경하지 않았습니다.'); return; }
+      const col = { name:'display_name', days:'days', role:'member_type', gender:'gender', start:'start_date', phone:'phone', kakao:'kakao', grade:'grade', joiningPaid:'joining_paid', shirtGiven:'shirt_given', monthlyPaid:'monthly_paid', isActive:'is_active' }[key];
+      if (!col) { m[key] = previous; return; }
+      const val = key === 'name' ? value : key === 'grade' ? (value === '' ? null : Number(value)) : ['gender','start','phone','kakao'].includes(key) ? (value || null) : value;
+      const {error} = await wtwtSB.from('wtwt_members').update({[col]:val}).eq('id', id);
+      if (error) { m[key] = previous; wtwtSave(a); alert('서버 저장 실패: ' + error.message); return; }
+      wtwtSave(a);
+    }
+    async function wtwtDelete(id) {
+      if (!confirm('이 회원을 서버 회원명부에서 삭제할까요?')) return;
+      if (wtwtRosterSource !== 'server' || !wtwtSB) { alert('서버 명부가 연결되지 않아 삭제하지 않았습니다.'); return; }
+      const {error} = await wtwtSB.from('wtwt_members').delete().eq('id', id);
+      if (error) { alert('서버 삭제 실패: ' + error.message); return; }
+      wtwtSave(wtwtMembers().filter(x => x.id !== id));
+    }
+    function wtwtEscape(s) { return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])) }
+    function wtwtTenure(v) { if (!v) return '미등록'; const d = new Date(v + 'T12:00:00'), now = new Date(); if (isNaN(d.getTime()) || d > now) return '확인 필요'; const months = (now.getFullYear() - d.getFullYear()) * 12 + now.getMonth() - d.getMonth() - (now.getDate() < d.getDate() ? 1 : 0); return Math.floor(months / 12) + '년 ' + months % 12 + '개월' }
+    function renderMyMember() { const m = currentWtwtMember(); document.getElementById('myMemberProfile').textContent = m ? m.name + ' · 구력 ' + wtwtTenure(m.start) : '본인 프로필 설정 후 구력 확인' }
+    function renderWtwtMembers() {
+      const a = wtwtMembers();
+      const count = document.getElementById('memberCount');
+      if (count) count.textContent = a.length;
+      [['countMon', '월'], ['countWed', '수'], ['countSat', '토'], ['countSun', '일']].forEach(([id, d]) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = a.filter(x => (x.days || []).includes(d)).length;
+      });
+      const list = document.getElementById('wtwtMemberList');
+      if (list) list.innerHTML = a.length ? a.map(m => `<div class="item" style="margin-top:8px"><div class="row"><b>${wtwtEscape(m.name)}</b><span>${(m.days || []).join('·')} · ${wtwtFee(m.days || []).toLocaleString()} VND/월</span></div><div style="display:flex;gap:12px;flex-wrap:wrap;margin:9px 0">${['월', '수', '토', '일'].map(d => `<label><input type="checkbox" ${(m.days || []).includes(d) ? 'checked' : ''} onchange="wtwtUpdate('${m.id}','days',this.checked?[...new Set([...wtwtMembers().find(x=>x.id==='${m.id}').days,'${d}'])]:wtwtMembers().find(x=>x.id==='${m.id}').days.filter(x=>x!=='${d}'))">${d}</label>`).join('')}</div><div style="display:flex;gap:12px;flex-wrap:wrap"><label><input type="checkbox" ${m.monthlyPaid ? 'checked' : ''} onchange="wtwtUpdate('${m.id}','monthlyPaid',this.checked)"> 월 회비 납부</label><label><input type="checkbox" ${m.joiningPaid ? 'checked' : ''} onchange="wtwtUpdate('${m.id}','joiningPaid',this.checked)"> 입단비 100만동 납부</label><label><input type="checkbox" ${m.shirtGiven ? 'checked' : ''} onchange="wtwtUpdate('${m.id}','shirtGiven',this.checked)"> 티셔츠 지급</label></div><button class="soft" style="margin-top:8px" onclick="wtwtDelete('${m.id}')">회원 삭제</button></div>`).join('') : '<p class="muted">새로 등록한 회원이 아직 없습니다. 기존 화면의 예시 회원과 별도로 관리됩니다.</p>';
+      const pub = document.getElementById('publicMemberList');
+      if (pub) pub.innerHTML = a.map(m => '<div class="item"><b>' + wtwtEscape(m.name) + '</b> · ' + wtwtEscape(m.role || '회원') + '<div class="muted">테니스 시작 ' + wtwtEscape(m.start || '미등록') + ' · 구력 ' + wtwtTenure(m.start) + ' · ' + wtwtEscape((m.days || []).join('·')) + '요일</div></div>').join('') || '등록된 회원 없음';
+      renderMyMember();
+      const duesSummary = document.getElementById('duesSummary');
+      if (duesSummary) duesSummary.textContent = '등록 회원 ' + a.length + '명 · 월 회비 예상 합계 ' + a.reduce((n, m) => n + wtwtFee(m.days || []), 0).toLocaleString() + ' VND · 입단비 납부 ' + a.filter(m => m.joiningPaid).length + '명 · 티셔츠 미지급 ' + a.filter(m => m.joiningPaid && !m.shirtGiven).length + '명';
+    }
+    function readWeeklySchedule() { try { return JSON.parse(localStorage.getItem('wtwt-weekly-schedule-v1') || '{}') } catch { return {} } }
+    function renderWeeklySchedule() { const data = readWeeklySchedule(); const pub = document.getElementById('weeklySchedulePublic'); if (pub) pub.innerHTML = wtwtWeekDays.map(d => { const x = data[d] || {}; return '<div class="item row"><b>' + d + '요일</b><span>' + (x.time ? wtwtEscape(x.time) : '시간 미정') + ' · ' + (x.court ? wtwtEscape(x.court) : '코트 미정') + '</span></div>' }).join(''); const editor = document.getElementById('weeklyScheduleEditor'); if (editor) editor.innerHTML = wtwtWeekDays.map(d => { const x = data[d] || {}; return '<div class="item"><b>' + d + '요일</b><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px"><input aria-label="' + d + '요일 시간" id="sched-time-' + d + '" placeholder="예: 19:00~21:00" value="' + wtwtEscape(x.time || '') + '" style="width:100%;padding:9px;border:1px solid #ddd;border-radius:9px"><input aria-label="' + d + '요일 코트" id="sched-court-' + d + '" placeholder="예: 4, 6번 코트" value="' + wtwtEscape(x.court || '') + '" style="width:100%;padding:9px;border:1px solid #ddd;border-radius:9px"></div></div>' }).join('') }
+    function saveWeeklySchedule() { const data = {}; wtwtWeekDays.forEach(d => { data[d] = { time: document.getElementById('sched-time-' + d).value.trim(), court: document.getElementById('sched-court-' + d).value.trim() } }); localStorage.setItem('wtwt-weekly-schedule-v1', JSON.stringify(data)); renderWeeklySchedule(); document.getElementById('weeklyScheduleMessage').textContent = '저장되었습니다. HOME 화면에 반영됩니다. (이 기기에서만 저장)' }
+    document.addEventListener('DOMContentLoaded', renderWeeklySchedule);
+
+    const guestDays = ['월', '수', '토', '일'], guestLimit = 16;
+    const dayIndex = { '일': 0, '월': 1, '수': 3, '토': 6 };
+    function nextClubDate(day) { const d = new Date(); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() + (dayIndex[day] - d.getDay() + 7) % 7); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0') }
+    function attRecords() { return guestGet('wtwt-attendance-v1', {}) }
+    function attDay(date) { return ['일', '월', '화', '수', '목', '금', '토'][new Date(date + 'T12:00:00').getDay()] }
+    // Test-only device identity. Real authentication requires a shared backend.
+    const WTWT_DEVICE_MEMBER = 'wtwt-device-member-id';
+    function currentWtwtMember() {
+      const id = localStorage.getItem(WTWT_DEVICE_MEMBER);
+      const all = wtwtMembers();
+      return all.find(m => m.id === id) || all.find(m => window.wtwtCurrentUserId && (m.id === window.wtwtCurrentUserId || m.authUserId === window.wtwtCurrentUserId)) || null;
+    }
+    function setWtwtDeviceMember(id) { if (id && wtwtMembers().some(m => m.id === id)) localStorage.setItem(WTWT_DEVICE_MEMBER, id); else localStorage.removeItem(WTWT_DEVICE_MEMBER); renderAttendance() }
+    async function syncMyApprovedProfile() {
+      if (!wtwtSB) return null;
+      const { data: { user } } = await wtwtSB.auth.getUser();
+      if (!user) return null;
+      window.wtwtCurrentUserId = user.id;
+      const { data: profile, error } = await wtwtSB.from('wtwt_member_signups')
+        .select('user_id,name,gender,start_date,phone,kakao,days,status')
+        .eq('user_id', user.id).eq('status', 'approved').maybeSingle();
+      if (error) throw error;
+      if (!profile) return null;
+      const all = wtwtMembers();
+      let m = all.find(x => x.id === user.id);
+      if (!m) {
+        m = { id: user.id, role: '회원', grade: '', joiningPaid: false, shirtGiven: false, monthlyPaid: false };
+        all.push(m);
+      }
+      Object.assign(m, { name: profile.name, gender: profile.gender, start: profile.start_date, phone: profile.phone || '', kakao: profile.kakao || '', days: profile.days || [] });
+      localStorage.setItem(wtwtStorageKey, JSON.stringify(all));
+      localStorage.setItem(WTWT_DEVICE_MEMBER, user.id);
+      renderWtwtMembers();
+      renderMyMember();
+      return m;
+    }
+    async function loadMyProfile() {
+      const msg = document.getElementById('myProfileMessage');
+      if (msg) msg.textContent = '프로필을 불러오는 중…';
+      try {
+        const m = await syncMyApprovedProfile() || currentWtwtMember();
+        document.getElementById('editMyName').value = m?.name || '김주예';
+        document.getElementById('editMyStart').value = m?.start || '';
+        document.getElementById('editMyPhone').value = m?.phone || '';
+        document.getElementById('editMyKakao').value = m?.kakao || '';
+        if (msg) msg.textContent = m ? '' : '관리자 회원 프로필을 처음 등록합니다. 테니스 시작일과 전화번호를 입력한 뒤 저장해 주세요.';
+      } catch (e) {
+        document.getElementById('editMyName').value = '김주예';
+        if (msg) msg.textContent = '프로필 조회 중 오류가 발생했습니다: ' + (e.message || e);
+      }
+    }
+    const WTWT_ROUND_PREF_KEY = 'wtwt-att-round-prefs-v1';
+    function attRoundPrefs(date) { return guestGet(WTWT_ROUND_PREF_KEY, {})[date] || {} }
+    function attSaveRoundPrefs() { const date = document.getElementById('attDate').value, m = currentWtwtMember(); if (!m || attRecords()[date + '|' + m.id] !== '참석') return alert('먼저 참석 신청을 해 주세요.'); const start = Number(document.getElementById('attStartRound').value) || 1, end = Number(document.getElementById('attEndRound').value) || 0; if (end && start > end) return alert('마지막 라운드는 첫 라운드보다 빠를 수 없습니다.'); const all = guestGet(WTWT_ROUND_PREF_KEY, {}); all[date] = { ...(all[date] || {}), [m.id]: { start, end } }; localStorage.setItem(WTWT_ROUND_PREF_KEY, JSON.stringify(all)); renderAttendance(); alert('출전 가능 라운드를 저장했습니다. 나중에 다시 수정할 수 있어요.'); }
+    function renderAttRoundPref(date, m, mine) { const el = document.getElementById('attRoundPref'); if (!el) return; if (!m || !mine) { el.innerHTML = ''; return } const pref = attRoundPrefs(date)[m.id] || {}; const options = (chosen, first) => '<option value="' + (first ? '1' : '0') + '">' + (first ? '1라운드부터 (정상 참석)' : '마지막 라운드까지 (정상 참석)') + '</option>' + Array.from({ length: 12 }, (_, i) => i + 1).filter(x => first ? x > 1 : true).map(x => '<option value="' + x + '" ' + (Number(chosen) === x ? 'selected' : '') + '>' + x + '라운드' + (first ? '부터' : '까지') + '</option>').join(''); el.innerHTML = '<b>⏱ 내 출전 시간 설정</b><p class="muted">늦게 오거나 일찍 가는 경우 직접 지정하세요. 참석 후에도 언제든 수정 가능합니다.</p><label>첫 출전 라운드<select id="attStartRound">' + options(pref.start || 1, true) + '</select></label><label>마지막 출전 라운드<select id="attEndRound">' + options(pref.end || 0, false) + '</select></label><button class="soft" onclick="attSaveRoundPrefs()">출전 시간 저장 / 수정</button>'; }
+    function attChange(status) { const date = document.getElementById('attDate').value, m = currentWtwtMember(); if (!m) { alert('MY 메뉴에서 최초 1회 본인 프로필을 설정해 주세요.'); return } const day = attDay(date); if (!m.days.includes(day)) { alert('등록한 요일만 출석 신청할 수 있습니다.'); return } if (status === '참석' && attRecords()[date + '|' + m.id] !== '참석' && guestCount(day, date) >= 16) { alert('16명 정원 마감입니다.'); return } guestSet('wtwt-attendance-v1', { ...attRecords(), [date + '|' + m.id]: status }); renderAttendance() }
+    function renderAttendance() { const dt = document.getElementById('attDate'); if (!dt) return; if (!dt.value) dt.value = nextClubDate('일'); const day = attDay(dt.value), eligible = wtwtMembers().filter(m => m.days.includes(day)), m = currentWtwtMember(), count = guestCount(day, dt.value); document.getElementById('attSummary').textContent = dt.value + ' (' + day + ') · ' + count + '/16명 · ' + (count >= 16 ? '마감' : '신청 가능'); const identity = document.getElementById('attIdentity'); if (identity) identity.innerHTML = m ? '👤 ' + wtwtEscape(m.name) + ' · 내 출석 관리' : '본인 프로필이 설정되지 않았어요. MY 메뉴에서 최초 1회 설정해 주세요.'; const mine = !!m && attRecords()[dt.value + '|' + m.id] === '참석'; document.getElementById('attAction').innerHTML = !m ? '<button class="soft" onclick="go(\'my\')">MY에서 본인 설정</button>' : !m.days.includes(day) ? '등록한 요일이 아닙니다.' : mine ? '<button class="soft" onclick="attChange(\'불참\')">불참으로 변경</button>' : '<button class="green" ' + (count >= 16 ? 'disabled' : '') + ' onclick="attChange(\'참석\')">참석</button><button class="soft" onclick="attChange(\'불참\')">불참</button>'; renderAttRoundPref(dt.value, m, mine); const members = eligible.filter(x => attRecords()[dt.value + '|' + x.id] === '참석').map(x => wtwtEscape(x.name) + ' (회원)'); const guests = guestRecords().filter(g => g.date === dt.value && g.status === '참석').map(g => wtwtEscape(g.name) + ' (게스트)'); document.getElementById('attList').innerHTML = [...members, ...guests].map((x, i) => '<div class="item">' + (i + 1) + '. ' + x + '</div>').join('') || '<p class="muted">아직 출석 신청자가 없습니다.</p>' }
+
+    function guestGet(key, fallback) { try { return JSON.parse(localStorage.getItem(key)) ?? fallback } catch { return fallback } }
+    function guestSet(key, val) { localStorage.setItem(key, JSON.stringify(val)); renderGuestSignup(); renderGuestAdmin(); renderAttendance(); renderHomeAttendance() }
+    function guestOpen() { return guestGet('wtwt-guest-open', {}) }
+    function guestRecords() { return guestGet('wtwt-guest-registrations', []) }
+    function guestCount(day, date) { const dt = date || nextClubDate(day); return Object.entries(attRecords()).filter(([k, v]) => k.startsWith(dt + '|') && v === '참석').length + guestRecords().filter(g => g.date === dt && g.status === '참석').length }
+    function guestToggle(day, checked) { guestSet('wtwt-guest-open', { ...guestOpen(), [day]: checked }) }
+    function renderGuestAdmin() { const c = document.getElementById('guestAdminControls'); if (c) c.innerHTML = guestDays.map(d => '<div class="item row"><span>' + d + '요일 · ' + guestCount(d) + '/16</span><label><input type="checkbox" ' + (guestOpen()[d] ? 'checked' : '') + ' onchange="guestToggle(\'' + d + '\',this.checked)"> 게스트 오픈</label></div>').join(''); const a = document.getElementById('guestAdminList'); if (a) a.innerHTML = guestRecords().map(g => '<div class="item row"><span>' + wtwtEscape(g.day) + ' · ' + wtwtEscape(g.name) + ' · ' + wtwtEscape(g.gender) + ' · ' + wtwtEscape(g.started || '시작일 미입력') + '</span><button onclick="cancelGuest(\'' + g.id + '\')">' + (g.status === '취소' ? '취소됨' : '신청 취소') + '</button></div>').join('') || '신청 없음'; const pay = guestGet('wtwt-guest-payment', {}); for (const [id, key] of [['guestFee', 'fee'], ['guestBank', 'bank'], ['guestAccount', 'account'], ['guestHolder', 'holder']]) { const el = document.getElementById(id); if (el && document.activeElement !== el) el.value = pay[key] || '' } }
+    function saveGuestPayment() { guestSet('wtwt-guest-payment', { fee: document.getElementById('guestFee').value, bank: document.getElementById('guestBank').value, account: document.getElementById('guestAccount').value, holder: document.getElementById('guestHolder').value }) }
+    function guestDateOptions(day) { const dates = []; const now = new Date(); now.setHours(12, 0, 0, 0); for (let i = 0; i < 84; i++) { const d = new Date(now); d.setDate(now.getDate() + i); if (d.getDay() === dayIndex[day]) { const iso = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); dates.push(iso) } } return dates }
+    function renderGuestSignup() { const day = document.getElementById('guestDay')?.value || '월', select = document.getElementById('guestDate'); if (!select) return; const dates = guestDateOptions(day), old = select.value; select.innerHTML = dates.map(d => '<option value="' + d + '">' + d + ' (' + day + ')' + '</option>').join(''); if (dates.includes(old)) select.value = old; const date = select.value, count = guestCount(day, date), open = !!guestOpen()[day]; const state = document.getElementById('guestAvailability'); if (state) state.textContent = date + ' · ' + count + '/16명 · ' + (count >= guestLimit ? '정원 마감 (취소 발생 시 자동 재오픈)' : open ? '게스트 신청 가능' : '운영진 게스트 오픈 대기'); const form = document.getElementById('guestForm'); if (form) form.style.display = open && count < guestLimit ? 'block' : 'none' }
+    function submitGuest() { const day = document.getElementById('guestDay').value, date = document.getElementById('guestDate').value, name = document.getElementById('guestName').value.trim(), gender = document.getElementById('guestGender').value; if (!name || !gender) { alert('이름과 성별을 입력해 주세요.'); return } if (!guestOpen()[day] || guestCount(day, date) >= guestLimit) { alert('게스트 신청이 마감되었습니다.'); renderGuestSignup(); return } const records = guestRecords(); records.push({ id: String(Date.now()) + Math.random(), day, date, name, gender, started: document.getElementById('guestStarted').value, club: document.getElementById('guestClub').value, status: '참석' }); guestSet('wtwt-guest-registrations', records); const pay = guestGet('wtwt-guest-payment', {}); const el = document.getElementById('guestPayment'); el.style.display = 'block'; el.textContent = '신청 완료 · 게스트비: ' + (pay.fee ? Number(pay.fee).toLocaleString() + ' VND' : '운영진 확인 필요') + ' · 입금계좌: ' + [pay.bank, pay.account, pay.holder].filter(Boolean).join(' / ') || '운영진 확인 필요'; document.getElementById('guestForm').style.display = 'none' }
+    function cancelGuest(id) { const a = guestRecords(); const g = a.find(x => x.id === id); if (g) { g.status = '취소'; guestSet('wtwt-guest-registrations', a) } }
+    document.addEventListener('DOMContentLoaded', () => { renderGuestAdmin(); renderGuestSignup(); renderAttendance() });
+
+    // WTWT draw engine: browser-only prototype; existing attendance and source sheets remain untouched.
+    const DRAW_KEY = 'wtwt-draw-v2';
+    const dget = () => { try { return JSON.parse(localStorage.getItem(DRAW_KEY) || '{}') } catch { return {} } };
+    const dsave = v => { localStorage.setItem(DRAW_KEY, JSON.stringify(v)); drawRefresh() };
+    const dday = date => ['일', '월', '화', '수', '목', '금', '토'][new Date(date + 'T12:00:00').getDay()];
+    const dkey = (a, b) => [a, b].sort().join('|');
+    const dconfig = id => document.getElementById(id);
+    function drawPlayers(date) {
+      const day = dday(date), members = wtwtMembers().filter(m => m.days.includes(day) && attRecords()[date + '|' + m.id] === '참석').map(m => ({ id: 'm' + m.id, name: m.name, grade: Number(m.grade) || 5, guest: false, gender: m.gender || '' }));
+      const guests = guestRecords().filter(g => g.date === date && g.status === '참석').map(g => ({ id: 'g' + g.id, name: g.name, grade: Number(g.grade) || 5, guest: true, gender: g.gender || '' }));
+      return members.concat(guests);
+    }
+    function drawHistory(date) {
+      const hist = { partners: {}, opponents: {}, games: {}, rests: {} };
+      const day = dday(date), month = date.slice(0, 7), all = dget();
+      Object.entries(all).forEach(([dt, entry]) => { if (dt >= date || dday(dt) !== day || !entry.final) return; (entry.matches || []).forEach(m => { const ids = m.ids; if (!ids || ids.length !== 4) return; if (dt.slice(0, 7) === month) ids.forEach(id => hist.games[id] = (hist.games[id] || 0) + 1);[[0, 1], [2, 3]].forEach(([i, j]) => { const k = dkey(ids[i], ids[j]); hist.partners[k] = (hist.partners[k] || 0) + 1 }); for (let i of [0, 1]) for (let j of [2, 3]) { const k = dkey(ids[i], ids[j]); hist.opponents[k] = (hist.opponents[k] || 0) + 1 } }) });
+      return hist;
+    }
+
+    const drawExtra = { avoids: [], early: {}, late: {} };
+    function drawExtraNames() { return Object.fromEntries(drawPlayers(dconfig('adminDrawDate').value || '').map(p => [p.id, p.name])); }
+    function drawAddAvoid() { const a = dconfig('drawAvoidA').value, b = dconfig('drawAvoidB').value, type = dconfig('drawAvoidType').value; if (!a || !b || a === b) return alert('서로 다른 두 선수를 선택해 주세요.'); if (!drawExtra.avoids.some(x => x.a === a && x.b === b && x.type === type || x.a === b && x.b === a && x.type === type)) drawExtra.avoids.push({ a, b, type }); drawRenderExtras(); }
+    function drawAddLate() { const id = dconfig('drawLatePlayer').value, r = Number(dconfig('drawLateRound').value); if (!id || !Number.isInteger(r) || r < 1 || r > 12) return alert('선수와 첫 출전 라운드를 선택해 주세요.'); drawExtra.late[id] = r; drawRenderExtras(); }
+    function drawRemoveLate(id) { delete drawExtra.late[id]; drawRenderExtras(); }
+    function drawAddEarly() { const id = dconfig('drawEarlyPlayer').value, r = Number(dconfig('drawEarlyRound').value); if (!id || !Number.isInteger(r) || r < 1 || r > 12) return alert('선수와 마지막 라운드를 선택해 주세요.'); drawExtra.early[id] = r; drawRenderExtras(); }
+    function drawRemoveAvoid(i) { drawExtra.avoids.splice(i, 1); drawRenderExtras(); }
+    function drawRemoveEarly(id) { delete drawExtra.early[id]; drawRenderExtras(); }
+    function drawRenderExtras() { const n = drawExtraNames(); const a = dconfig('drawAvoidList'), e = dconfig('drawEarlyList'), l = dconfig('drawLateList'); if (a) a.innerHTML = drawExtra.avoids.map((x, i) => '<div class="item">' + wtwtEscape(n[x.a] || x.a) + ' · ' + wtwtEscape(n[x.b] || x.b) + ' (' + ({ partner: '파트너', opponent: '상대', both: '모두' }[x.type]) + ') <button class="soft" style="width:auto" onclick="drawRemoveAvoid(' + i + ')">삭제</button></div>').join('') || '지정 없음'; if (e) e.innerHTML = Object.entries(drawExtra.early).map(([id, r]) => '<div class="item">' + wtwtEscape(n[id] || id) + ' : ' + r + 'R까지 <button class="soft" style="width:auto" onclick="drawRemoveEarly(\'' + id + '\')">삭제</button></div>').join('') || '지정 없음'; if (l) l.innerHTML = Object.entries(drawExtra.late).map(([id, r]) => '<div class="item">' + wtwtEscape(n[id] || id) + ' : ' + r + 'R부터 <button class="soft" style="width:auto" onclick="drawRemoveLate(\'' + id + '\')">삭제</button></div>').join('') || '지정 없음'; }
+
+    function drawGenerate() {
+      const date = dconfig('adminDrawDate')?.value; if (!date) return alert('날짜를 선택해 주세요.');
+      const store = dget(); if (store[date]?.final) return alert('FINAL 확정된 대진입니다. 먼저 확정을 해제해 주세요.');
+      const players = drawPlayers(date); if (players.length < 4) return alert('출석한 선수가 4명 이상 필요합니다.');
+      const mode = dconfig('drawGenderMode').value;
+      const eligible = players.filter(p => mode === 'women' ? p.gender === '여' : mode === 'men' ? p.gender === '남' : true);
+      if (eligible.length < 4) return alert('선택한 복식 부문에 출석 선수가 4명 이상 필요합니다.');
+      const rounds = Math.min(12, Math.max(1, +dconfig('drawRounds').value || 4));
+      const courts = Math.min(6, Math.max(1, +dconfig('drawCourtCount').value || 2));
+      const courtSet = v => v.split(',').map(x => x.trim()).filter(Boolean);
+      const first = courtSet(dconfig('drawCourtsFirst').value), second = courtSet(dconfig('drawCourtsSecond').value);
+      const switchR = +dconfig('drawSwitchRound').value || 3, guest2 = dconfig('drawGuestFrom2').checked;
+      const repeat = dconfig('drawAvoidRepeat').checked, rest = dconfig('drawAvoidDoubleRest').checked, carry = dconfig('drawCumulative').checked;
+      const balance = +dconfig('drawBalance').value, history = drawHistory(date);
+      const counts = {}, lastRest = {}, partners = { ...history.partners }, opponents = { ...history.opponents };
+      const forced = [dconfig('drawPartnerA').value, dconfig('drawPartnerB').value];
+      const strength = dconfig('drawPartnerStrength').value, avoids = drawExtra.avoids.map(x => ({ ...x })), early = { ...drawExtra.early };
+      const roundPrefs = attRoundPrefs(date); const late = { ...Object.fromEntries(Object.entries(roundPrefs).map(([id, v]) => ['m' + id, Number(v.start) || 1])), ...drawExtra.late }; for (const [id, v] of Object.entries(roundPrefs)) { if (v.end) early['m' + id] = Number(v.end) }
+      eligible.forEach(p => { counts[p.id] = 0; lastRest[p.id] = false });
+      let best = null, bestScore = Infinity;
+      // Multiple deterministic-shape random candidates; keep the lowest repeat/imbalance penalty.
+      for (let attempt = 0; attempt < 80; attempt++) {
+        const games = [], cnt = { ...counts }, lp = { ...partners }, lo = { ...opponents }, prev = { ...lastRest }; let score = 0;
+        for (let r = 1; r <= rounds; r++) {
+          const active = eligible.filter(p => (r !== 1 || !guest2 || !p.guest) && r >= (late[p.id] || 1) && (!early[p.id] || r <= early[p.id]));
+          const availableCourts = (r < switchR ? first : second).slice(0, courts);
+          const slots = Math.min(availableCourts.length, Math.floor(active.length / 4));
+          const selected = [...active].sort((a, b) => {
+            const ca = cnt[a.id] + (carry ? (history.games[a.id] || 0) * 2 : 0);
+            const cb = cnt[b.id] + (carry ? (history.games[b.id] || 0) * 2 : 0);
+            return ca - cb || ((rest && prev[b.id] ? 1 : 0) - (rest && prev[a.id] ? 1 : 0)) || (Math.random() - .5);
+          }).slice(0, slots * 4);
+          const ids = new Set(selected.map(p => p.id));
+          players.forEach(p => { if (active.some(x => x.id === p.id)) { if (!ids.has(p.id) && rest && prev[p.id]) score += 25; prev[p.id] = !ids.has(p.id) } });
+          for (let c = 0; c < slots; c++) {
+            const four = selected.slice(c * 4, c * 4 + 4);
+            let opts = [[0, 1, 2, 3], [0, 2, 1, 3], [0, 3, 1, 2]];
+            const grade = id => four[id].grade;
+            opts = opts.map(o => {
+              const ids = o.map(i => four[i].id);
+              const repeated = (lp[dkey(ids[0], ids[1])] || 0) + (lp[dkey(ids[2], ids[3])] || 0);
+              let opposed = 0; for (let i of [0, 1]) for (let j of [2, 3]) opposed += (lo[dkey(ids[i], ids[j])] || 0);
+              const diff = Math.abs(grade(o[0]) + grade(o[1]) - grade(o[2]) - grade(o[3]));
+              const paired = forced[0] && forced[1] && (dkey(ids[0], ids[1]) === dkey(...forced) || dkey(ids[2], ids[3]) === dkey(...forced));
+              const bothSelected = forced[0] && forced[1] && ids.includes(forced[0]) && ids.includes(forced[1]);
+              const priority = bothSelected ? (paired ? ({ hard: -100000, strong: -120, normal: -30, weak: -8 }[strength]) : ({ hard: 100000, strong: 120, normal: 30, weak: 8 }[strength])) : 0;
+              const sameGender = (ids[0] && ids[1] && ids[2] && ids[3]) && [[0, 1], [2, 3]].every(([i, j]) => four.find(p => p.id === ids[i])?.gender === four.find(p => p.id === ids[j])?.gender);
+              const genderPenalty = mode === 'same' && !sameGender ? 100000 : 0;
+              let avoidPenalty = 0;
+              for (const av of avoids) { if (!ids.includes(av.a) || !ids.includes(av.b)) continue; const pair = dkey(av.a, av.b), isPartner = dkey(ids[0], ids[1]) === pair || dkey(ids[2], ids[3]) === pair; const hit = av.type === 'both' || av.type === 'partner' && isPartner || av.type === 'opponent' && !isPartner; if (hit) avoidPenalty += 100000; }
+              return { ids, penalty: (repeat ? repeated * 12 + opposed * 3 : 0) + diff * balance * 3 + priority + genderPenalty + avoidPenalty };
+            }).sort((a, b) => a.penalty - b.penalty);
+            const match = opts[0]; score += match.penalty;
+            [[0, 1], [2, 3]].forEach(([i, j]) => { const k = dkey(match.ids[i], match.ids[j]); lp[k] = (lp[k] || 0) + 1 });
+            for (let i of [0, 1]) for (let j of [2, 3]) { const k = dkey(match.ids[i], match.ids[j]); lo[k] = (lo[k] || 0) + 1 }
+            match.ids.forEach(id => cnt[id]++);
+            games.push({ round: r, court: availableCourts[c], ids: match.ids, scoreA: '', scoreB: '' });
+          }
+        }
+        const values = eligible.filter(p => (late[p.id] || 1) <= rounds).map(p => cnt[p.id]); score += (Math.max(...values) - Math.min(...values)) * 80;
+        if (score < bestScore) { bestScore = score; best = games }
+      }
+      store[date] = { matches: best, final: false, players, settings: { rounds, courts, switchR, first, second, guest2, repeat, rest, carry, balance, forced, late, mode, strength, avoids, early }, updated: new Date().toISOString() };
+      dsave(store);
+    }
+    function drawSaveFinal() { const dt = dconfig('adminDrawDate').value, st = dget(); if (!st[dt]?.matches?.length) return alert('먼저 대진을 생성해 주세요.'); const problem = drawValidateFinal(st[dt]); if (problem) return alert(problem); st[dt].final = true; dsave(st) }
+    function drawUnlock() { const dt = dconfig('adminDrawDate').value, st = dget(); if (st[dt]) { st[dt].final = false; dsave(st) } }
+    function drawEditCourt(i, value) { const dt = dconfig('adminDrawDate').value, st = dget(), e = st[dt]; if (!e || e.final) return; const court = String(value).trim(); if (!court) return alert('코트 번호를 입력해 주세요.'); if (e.matches.some((m, j) => j !== i && m.round === e.matches[i].round && String(m.court) === court)) return alert('같은 라운드에 동일한 코트가 이미 배정되어 있습니다.'); e.matches[i].court = court; dsave(st) }
+    function drawValidateFinal(e) { for (const m of e.matches) { if (new Set(m.ids).size !== 4) return '같은 경기 안에 중복 선수가 있습니다.'; for (const id of m.ids) { const a = e.settings?.late || {}, b = e.settings?.early || {}; if (m.round < (a[id] || 1) || m.round > (b[id] || 99)) return '출전 가능 라운드를 벗어난 선수가 있습니다.' } for (const n of e.matches) { if (n === m || n.round !== m.round) continue; if (n.court === m.court) return '같은 라운드에서 코트가 중복됩니다.'; if (n.ids.some(id => m.ids.includes(id))) return '같은 라운드에서 선수가 중복 출전합니다.' } } return '' }
+    function drawEditMatch(i, pos, value) { const dt = dconfig('adminDrawDate').value, st = dget(), e = st[dt]; if (!e || e.final) return; const m = e.matches[i]; if (m.ids.includes(value) && m.ids[pos] !== value) return alert('같은 경기에 중복 선수가 있습니다.'); m.ids[pos] = value; dsave(st) }
+    function drawScore(i, side, value) { const dt = dconfig('adminDrawDate').value, st = dget(); if (st[dt]?.matches[i]) { st[dt].matches[i][side] = value; dsave(st) } }
+
+    function playSwitch(kind, btn) { for (const id of ['Mine', 'All', 'Score']) { const el = document.getElementById('play' + id); if (el) el.style.display = (id.toLowerCase() === kind ? 'block' : 'none') } document.querySelectorAll('.play-switch button').forEach(x => x.classList.toggle('active', x === btn)); }
+    function playSaveScore(i) { const date = dconfig('drawDate').value, all = dget(), entry = all[date], m = entry?.matches?.[i], self = currentWtwtMember(); if (!entry?.final || !m || !self || !m.ids.includes('m' + self.id)) return alert('본인이 출전한 확정 경기만 입력할 수 있습니다.'); const a = dconfig('playScoreA' + i), b = dconfig('playScoreB' + i); if (!a || !b || a.value === '' || b.value === '') return alert('양쪽 점수를 모두 입력해 주세요.'); const x = Number(a.value), y = Number(b.value); if (!Number.isInteger(x) || !Number.isInteger(y) || x < 0 || y < 0 || x > 99 || y > 99) return alert('0~99 사이의 점수를 입력해 주세요.'); m.scoreA = String(x); m.scoreB = String(y); dsave(all); alert('점수가 이 브라우저에 저장됐습니다. 실제 회원 공유는 서버 연결 후 가능합니다.'); }
+    function playRenderMatches() {
+      const date = dconfig('drawDate')?.value, entry = dget()[date], self = currentWtwtMember(), selfId = self ? 'm' + self.id : null; const mine = dconfig('playMine'), all = dconfig('playAll'), score = dconfig('playScore'); if (!mine || !all || !score) return;
+      if (!entry?.final) { mine.innerHTML = all.innerHTML = score.innerHTML = '<div class="play-empty">이 날짜에 확정된 대진이 아직 없어요.</div>'; return }
+      const names = Object.fromEntries((entry.players || []).map(p => [p.id, p.name])); const matches = entry.matches || [];
+      const card = (m, i, editable) => { const left = m.ids.slice(0, 2).map(id => wtwtEscape(names[id] || id)).join(' + '), right = m.ids.slice(2).map(id => wtwtEscape(names[id] || id)).join(' + '), hasScore = m.scoreA !== '' && m.scoreB !== '' && m.scoreA != null && m.scoreB != null; return '<div class="play-match"><div class="meta">' + m.round + '라운드 · ' + wtwtEscape(m.court) + '번 코트</div><div class="teams">' + left + '<br><span style="color:#8a97a8">VS</span><br>' + right + '</div>' + (editable ? '<div class="play-score-line"><input type="number" min="0" max="99" id="playScoreA' + i + '" value="' + wtwtEscape(m.scoreA ?? '') + '" aria-label="첫 팀 점수"> : <input type="number" min="0" max="99" id="playScoreB' + i + '" value="' + wtwtEscape(m.scoreB ?? '') + '" aria-label="두 번째 팀 점수"><button onclick="playSaveScore(' + i + ')">저장</button></div>' : hasScore ? '<div class="meta">결과 ' + wtwtEscape(m.scoreA) + ' : ' + wtwtEscape(m.scoreB) + '</div>' : '<div class="meta">점수 미입력</div>') + '</div>' };
+      all.innerHTML = matches.map((m, i) => card(m, i, false)).join('') || '<div class="play-empty">경기가 없습니다.</div>';
+      if (!selfId) { mine.innerHTML = score.innerHTML = '<div class="play-empty">MY에서 본인 프로필을 설정하면 내 경기와 점수 입력을 이용할 수 있어요.</div>'; return }
+      const own = matches.map((m, i) => ({ m, i })).filter(x => x.m.ids.includes(selfId)); mine.innerHTML = own.length ? own.map(x => card(x.m, x.i, false)).join('') : '<div class="play-empty">이 날짜에 배정된 내 경기가 없습니다.</div>'; score.innerHTML = own.length ? own.map(x => card(x.m, x.i, true)).join('') : '<div class="play-empty">점수를 입력할 내 경기가 없습니다.</div>';
+    }
+
+    function drawRenderStats() {
+      const id = dconfig('drawStatsPlayer')?.value, date = dconfig('drawDate')?.value, el = dconfig('drawStats'); if (!el) return;
+      if (!id) { el.textContent = '선수를 선택하면 파트너·상대 매칭 횟수와 비율이 표시됩니다.'; return }
+      const data = dget(), names = {}; wtwtMembers().forEach(m => names['m' + m.id] = m.name);
+      const partner = {}, opponent = {}; let games = 0;
+      Object.entries(data).forEach(([dt, e]) => { if (!e.final || dday(dt) !== dday(date)) return; (e.players || []).forEach(p => names[p.id] = p.name); (e.matches || []).forEach(m => { const ids = m.ids || []; if (!ids.includes(id)) return; games++; const ix = ids.indexOf(id); const mate = ids[ix % 2 === 0 ? ix + 1 : ix - 1]; partner[mate] = (partner[mate] || 0) + 1; ids.slice(ix < 2 ? 2 : 0, ix < 2 ? 4 : 2).forEach(x => opponent[x] = (opponent[x] || 0) + 1) }) });
+      const fmt = obj => Object.entries(obj).sort((a, b) => b[1] - a[1]).map(([k, v]) => wtwtEscape(names[k] || k) + ' ' + v + '회 (' + (games ? Math.round(v / games * 100) : 0) + '%)').join(' · ') || '기록 없음';
+      el.innerHTML = '<b>확정 대진 누적 ' + games + '게임</b><div>파트너: ' + fmt(partner) + '</div><div>상대: ' + fmt(opponent) + '</div><small>같은 요일의 FINAL 대진 기준 · 비율은 해당 선수의 총 경기수 대비 · 게스트 포함</small>';
+    }
+    function drawRefresh() {
+      const a = dconfig('adminDrawDate'), d = dconfig('drawDate'); if (!a || !d) return;
+      if (!a.value) a.value = nextClubDate('일'); if (!d.value) d.value = a.value;
+      const dt = a.value, people = drawPlayers(dt), st = dget()[dt];
+      dconfig('drawParticipants').textContent = dt + ' · 출석 ' + people.length + '명: ' + people.map(p => p.name + (p.guest ? '(게스트)' : '')).join(', ');
+      for (const id of ['drawPartnerA', 'drawPartnerB', 'drawLatePlayer', 'drawEarlyPlayer', 'drawAvoidA', 'drawAvoidB']) {
+        const sel = dconfig(id), old = sel.value; sel.innerHTML = '<option value="">선택 안 함</option>' + people.map(p => '<option value="' + wtwtEscape(p.id) + '">' + wtwtEscape(p.name) + '</option>').join(''); sel.value = old;
+      }
+      const history = drawHistory(dt), monthly = document.getElementById('drawMonthlyCounts'); if (monthly) monthly.innerHTML = people.map(p => '<div class="row" style="padding:5px 0;border-bottom:1px solid #eee"><span>' + wtwtEscape(p.name) + '</span><b>' + ((history.games[p.id] || 0)) + '게임</b></div>').join('') || '출석자가 없습니다.'; const names = Object.fromEntries((st?.players || people).map(p => [p.id, p.name]));
+      const display = (m, i, admin) => '<div class="item"><b>' + m.round + 'R · 코트 ' + wtwtEscape(m.court) + '</b>' + (admin && !st.final ? '<label>코트 번호 <input style="max-width:90px" value="' + wtwtEscape(m.court) + '" onchange="drawEditCourt(' + i + ',this.value)"></label>' : '') + '<div>' + m.ids.slice(0, 2).map(id => wtwtEscape(names[id] || id)).join(' + ') + ' <b>VS</b> ' + m.ids.slice(2).map(id => wtwtEscape(names[id] || id)).join(' + ') + '</div>' + (admin && !st.final ? m.ids.map((id, pos) => '<select onchange="drawEditMatch(' + i + ',' + pos + ',this.value)">' + (st.players || []).map(p => '<option value="' + wtwtEscape(p.id) + '" ' + (p.id === id ? 'selected' : '') + '>' + wtwtEscape(p.name) + '</option>').join('') + '</select>').join('') : '') + (admin ? '<div>점수 <input style="width:55px" type="number" min="0" value="' + wtwtEscape(m.scoreA || '') + '" onchange="drawScore(' + i + ',&quot;scoreA&quot;,this.value)"> : <input style="width:55px" type="number" min="0" value="' + wtwtEscape(m.scoreB || '') + '" onchange="drawScore(' + i + ',&quot;scoreB&quot;,this.value)"></div>' : '') + '</div>';
+      dconfig('drawAdminResult').innerHTML = st ? '<p><b>' + (st.final ? 'FINAL 확정' : '임시 대진') + '</b> · ' + st.matches.length + '경기</p>' + st.matches.map((m, i) => display(m, i, true)).join('') : '대진을 생성하면 여기에 표시됩니다.';
+      const pub = dget()[d.value]; dconfig('drawPublished').innerHTML = pub?.final ? '<h3>확정 대진</h3>' + pub.matches.map((m, i) => { const n = Object.fromEntries((pub.players || []).map(p => [p.id, p.name])); return '<div class="item"><b>' + m.round + 'R · 코트 ' + wtwtEscape(m.court) + '</b><div>' + m.ids.slice(0, 2).map(id => wtwtEscape(n[id] || id)).join(' + ') + ' VS ' + m.ids.slice(2).map(id => wtwtEscape(n[id] || id)).join(' + ') + '</div></div>' }).join('') : '<p class="muted">확정된 대진이 없습니다.</p>';
+      const stats = dconfig('drawStatsPlayer'), old = stats.value; stats.innerHTML = '<option value="">선수 선택</option>' + wtwtMembers().map(m => '<option value="m' + wtwtEscape(m.id) + '">' + wtwtEscape(m.name) + '</option>').join(''); stats.value = old; drawRenderStats(); playRenderMatches();
+    }
+    function renderHomeAttendance() { for (const [day, id] of [['월', 'homeMon'], ['수', 'homeWed'], ['토', 'homeSat'], ['일', 'homeSun']]) { const el = document.getElementById(id); if (el) el.textContent = guestCount(day, nextClubDate(day)) + ' / 16' } }
+    document.addEventListener('DOMContentLoaded', renderHomeAttendance);
+    document.addEventListener('DOMContentLoaded', drawRefresh);
+
+    function duesMonth() { const e = document.getElementById('duesMonth'); if (!e) return ''; if (!e.value) e.value = new Date().toISOString().slice(0, 7); return e.value }
+    function duesMap() { return guestGet('wtwt-monthly-dues-confirmations', {}) }
+    function duesToggle(id, checked) { const k = duesMonth() + '|' + id; guestSet('wtwt-monthly-dues-confirmations', { ...duesMap(), [k]: checked }); renderDuesAdmin() }
+    function guestPayMap() { return guestGet('wtwt-guest-payment-confirmations', {}) }
+    function guestPayToggle(id, checked) { guestSet('wtwt-guest-payment-confirmations', { ...guestPayMap(), [id]: checked }); renderDuesAdmin() }
+    function renderDuesAdmin() { const m = document.getElementById('duesMemberList'); if (!m) return; const month = duesMonth(), a = wtwtMembers(), paid = duesMap(); m.innerHTML = a.map(x => '<div class="item row"><div><b>' + wtwtEscape(x.name) + '</b><div class="muted">' + wtwtEscape(x.days.join('·')) + ' · ' + wtwtFee(x.days).toLocaleString() + ' VND</div></div><label><input type="checkbox" ' + (paid[month + '|' + x.id] ? 'checked' : '') + ' onchange="duesToggle(&quot;' + x.id + '&quot;,this.checked)"> 입금 확인</label></div>').join('') || '등록된 회원이 없습니다.'; document.getElementById('duesMemberSummary').textContent = '입금 확인 ' + a.filter(x => paid[month + '|' + x.id]).length + ' / ' + a.length + '명 · 확인 금액 ' + a.filter(x => paid[month + '|' + x.id]).reduce((n, x) => n + wtwtFee(x.days), 0).toLocaleString() + ' VND'; const g = document.getElementById('duesGuestList'), gp = guestPayMap(); g.innerHTML = guestRecords().filter(x => x.status === '참석').map(x => '<div class="item row"><div><b>' + wtwtEscape(x.name) + '</b><div class="muted">' + wtwtEscape(x.date || x.day) + ' · 게스트</div></div><label><input type="checkbox" ' + (gp[x.id] ? 'checked' : '') + ' onchange="guestPayToggle(&quot;' + x.id + '&quot;,this.checked)"> 입금 확인</label></div>').join('') || '게스트 신청 내역이 없습니다.' }
+    document.addEventListener('DOMContentLoaded', renderDuesAdmin);
+
+    async function submitMemberSignup() {
+      const message = document.getElementById('signupMessage');
+      if (!wtwtSB) { message.textContent = '로그인 서비스를 불러오지 못했습니다.'; return }
+      const { data: { user }, error: userError } = await wtwtSB.auth.getUser();
+      if (userError || !user) { message.textContent = '먼저 이메일 인증 후 로그인해 주세요.'; return }
+      if (!user.email_confirmed_at) { message.textContent = '이메일 인증을 완료한 뒤 신청해 주세요.'; return }
+      const name = document.getElementById('signupName').value.trim(), gender = document.getElementById('signupGender').value, start = document.getElementById('signupStart').value, phone = document.getElementById('signupPhone').value.trim(), kakao = document.getElementById('signupKakao').value.trim();
+      const days = [...document.querySelectorAll('#signupDays input:checked')].map(e => e.value);
+      if (!name || !gender || !start || !phone || !days.length) { message.textContent = '필수 항목(이름, 성별, 시작일, 전화번호, 등록 요일)을 입력해 주세요.'; return }
+      if (new Date(start + 'T12:00:00') > new Date()) { message.textContent = '테니스 시작일을 확인해 주세요.'; return }
+      message.textContent = '신청 내용을 저장하고 있습니다…';
+      const { error } = await wtwtSB.from('wtwt_member_signups').upsert({
+        user_id: user.id, name, gender, start_date: start, phone, kakao: kakao || null, days, status: 'pending', updated_at: new Date().toISOString()
+      }, { onConflict: 'user_id' });
+      if (error) { message.textContent = '저장하지 못했습니다: ' + error.message; return }
+      ['signupName', 'signupStart', 'signupPhone', 'signupKakao'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('signupGender').value = '';
+      document.querySelectorAll('#signupDays input').forEach(e => e.checked = false);
+      message.textContent = '가입 신청이 서버에 저장되었습니다. 운영진 승인 결과를 기다려 주세요.';
+    }
+    async function approveMemberSignup(userId) {
+      if (!window.wtwtRole || !['admin', 'super_admin'].includes(window.wtwtRole)) { alert('운영진 계정으로 로그인해 주세요.'); return }
+      if (!confirm('이 회원의 가입을 승인할까요?')) return;
+      const { error } = await wtwtSB.rpc('wtwt_approve_member_signup', { p_user_id: userId });
+      if (error) { alert('승인하지 못했습니다: ' + error.message); return }
+      const { data: m, error: readError } = await wtwtSB.from('wtwt_member_signups').select('user_id,name,gender,start_date,phone,kakao,days').eq('user_id', userId).maybeSingle();
+      if (!readError && m) {
+        const all = wtwtMembers();
+        if (!all.some(x => x.id === m.user_id || x.phone === m.phone && x.name === m.name)) {
+          all.push({ id: m.user_id, name: m.name, gender: m.gender, start: m.start_date, phone: m.phone, kakao: m.kakao || '', days: m.days || [], role: '회원', grade: '', joiningPaid: false, shirtGiven: false, monthlyPaid: false });
+          wtwtSave(all);
+        }
+      }
+      await renderSignupPending();
+      await renderApprovedMemberDirectory();
+      alert('가입을 승인했습니다. 회원명부에 반영되었습니다. (관리자 화면의 회비·대진 관리 목록은 현재 기기에도 추가했습니다.)');
+    }
+    // Keep the admin member-management list in sync across devices using approved server signups.
+    // Existing local-only member records are preserved; approved server members are merged by user ID,
+    // or by matching name + phone when an older local record has a different ID.
+    async function syncApprovedMembersToLocalStorage() {
+      if (!wtwtSB || !window.wtwtRole || !['admin', 'super_admin'].includes(window.wtwtRole)) return;
+      const { data: approved, error } = await wtwtSB
+        .from('wtwt_member_signups')
+        .select('user_id,name,gender,start_date,phone,kakao,days')
+        .eq('status', 'approved');
+      if (error) {
+        console.error('승인 회원 동기화 실패:', error.message);
+        return;
+      }
+      const all = wtwtMembers();
+      let changed = false;
+      (approved || []).forEach(m => {
+        const existing = all.find(x => x.id === m.user_id || (x.name === m.name && x.phone && m.phone && x.phone === m.phone));
+        if (existing) {
+          // Fill missing profile fields but preserve admin-managed fields like dues and grade.
+          if (!existing.id) { existing.id = m.user_id; changed = true; }
+          if (!existing.gender && m.gender) { existing.gender = m.gender; changed = true; }
+          if (!existing.start && m.start_date) { existing.start = m.start_date; changed = true; }
+          if (!existing.phone && m.phone) { existing.phone = m.phone; changed = true; }
+          if (!existing.kakao && m.kakao) { existing.kakao = m.kakao; changed = true; }
+          if ((!existing.days || !existing.days.length) && m.days && m.days.length) { existing.days = m.days; changed = true; }
+          if (!existing.role) { existing.role = '회원'; changed = true; }
+        } else {
+          all.push({
+            id: m.user_id, name: m.name, gender: m.gender, start: m.start_date,
+            phone: m.phone, kakao: m.kakao || '', days: m.days || [], role: '회원',
+            grade: '', joiningPaid: false, shirtGiven: false, monthlyPaid: false
+          });
+          changed = true;
+        }
+      });
+      if (changed) wtwtSave(all);
+      else renderWtwtMembers();
+    }
+
+    async function rejectMemberSignup(userId) {
+      if (!window.wtwtRole || !['admin', 'super_admin'].includes(window.wtwtRole)) { alert('운영진 계정으로 로그인해 주세요.'); return }
+      if (!confirm('이 가입 신청을 거절할까요?')) return;
+      const { error } = await wtwtSB.from('wtwt_member_signups').update({ status: 'rejected', updated_at: new Date().toISOString() }).eq('user_id', userId).eq('status', 'pending');
+      if (error) { alert('거절 처리에 실패했습니다: ' + error.message); return }
+      await renderSignupPending();
+    }
+    async function renderSignupPending() {
+      const target = document.getElementById('signupPendingList'); if (!target) return;
+      if (!wtwtSB || !window.wtwtRole || !['admin', 'super_admin'].includes(window.wtwtRole)) { target.textContent = '운영진 계정으로 로그인하면 신청 내역을 확인할 수 있습니다.'; return }
+      target.textContent = '신청 내역을 불러오는 중…';
+      const { data: pending, error } = await wtwtSB.from('wtwt_member_signups').select('user_id,name,gender,start_date,phone,kakao,days,created_at').eq('status', 'pending').order('created_at', { ascending: true });
+      if (error) { target.textContent = '신청 내역을 불러오지 못했습니다: ' + error.message; return }
+      target.innerHTML = pending?.length ? pending.map(m => `<div class="item"><b>${wtwtEscape(m.name)}</b> · ${wtwtEscape(m.gender)} · ${wtwtEscape((m.days || []).join('·'))}요일<div class="muted">테니스 시작 ${wtwtEscape(m.start_date)} · ${wtwtTenure(m.start_date)}</div><div class="muted">연락처(운영진 확인용): ${wtwtEscape(m.phone)} · 카카오 ${wtwtEscape(m.kakao || '없음')}</div><div class="muted">신청일: ${wtwtEscape((m.created_at || '').slice(0, 10))}</div><button class="green" onclick="approveMemberSignup('${wtwtEscape(m.user_id)}')">회원 승인</button><button class="soft" onclick="rejectMemberSignup('${wtwtEscape(m.user_id)}')">거절</button></div>`).join('') : '승인 대기 중인 신청이 없습니다.';
+    }
+    async function renderApprovedMemberDirectory() {
+      const pub = document.getElementById('publicMemberList'); if (!pub || !wtwtSB) return;
+      const { data: members, error } = await wtwtSB.from('wtwt_member_signups').select('name,gender,start_date,days').eq('status', 'approved').order('name');
+      if (error) { pub.textContent = '회원명부를 불러오지 못했습니다: ' + error.message; return }
+      pub.innerHTML = members?.length ? members.map(m => `<div class="item"><b>${wtwtEscape(m.name)}</b> · 회원<div class="muted">테니스 시작 ${wtwtEscape(m.start_date || '미등록')} · 구력 ${wtwtTenure(m.start_date)} · ${wtwtEscape((m.days || []).join('·'))}요일</div></div>`).join('') : '등록된 회원 없음';
+    }
+    document.addEventListener('DOMContentLoaded', () => { renderApprovedMemberDirectory() });
+
+    function clubPanel(name) { go('clubDetail'); document.getElementById('clubDetailTitle').textContent = name; document.getElementById('clubDetailBody').textContent = name === '클럽 소개' ? 'WE TENNIS ★ WINNING TENNIS · 혼자보다 함께 할 때 더 즐거운 테니스. 즐겁게 치다보면 어느 새 한단계 더 성장하는 테니스' : '콘텐츠 등록 기능은 추후 공유 데이터베이스 연결 후 제공됩니다.' }
+    window.saveMyProfile = async function saveMyProfile() {
+      const msg = document.getElementById('myProfileMessage');
+      const btn = document.querySelector('#myEditPanel button[onclick="saveMyProfile()"]');
+      const setMsg = (text) => { if (msg) msg.textContent = text; };
+      const name = (document.getElementById('editMyName')?.value || '').trim();
+      if (!name) { setMsg('이름을 입력해 주세요.'); return; }
+      if (!wtwtSB) { setMsg('서버 연결을 확인할 수 없습니다. 페이지를 새로고침해 주세요.'); return; }
+      const startDate = document.getElementById('editMyStart')?.value || '';
+      const phone = (document.getElementById('editMyPhone')?.value || '').trim();
+      const kakao = (document.getElementById('editMyKakao')?.value || '').trim();
+      if (!startDate || !phone) { setMsg('테니스 시작일과 전화번호를 입력해 주세요.'); return; }
+      if (btn) { btn.disabled = true; btn.textContent = '저장 중…'; }
+      setMsg('프로필을 저장하는 중입니다…');
+      try {
+        const { data: { user }, error: userError } = await wtwtSB.auth.getUser();
+        if (userError) throw userError;
+        if (!user) { setMsg('로그인이 만료되었습니다. 다시 로그인해 주세요.'); return; }
+        const { data: account, error: accountError } = await wtwtSB.from('wtwt_accounts')
+          .select('role').eq('user_id', user.id).maybeSingle();
+        if (accountError) throw accountError;
+        window.wtwtRole = account?.role || window.wtwtRole;
+        const { data: existing, error: readError } = await wtwtSB.from('wtwt_member_signups')
+          .select('user_id,status').eq('user_id', user.id).eq('status', 'approved').maybeSingle();
+        if (readError) throw readError;
+        if (existing) {
+          const { error: updateError } = await wtwtSB.from('wtwt_member_signups').update({
+            name, gender: '여성', start_date: startDate, phone, kakao: kakao || null,
+            days: ['월', '수', '토', '일'], updated_at: new Date().toISOString()
+          }).eq('user_id', user.id).eq('status', 'approved');
+          if (updateError) throw updateError;
+        } else {
+          if (!['admin', 'super_admin'].includes(window.wtwtRole)) {
+            setMsg('승인된 회원 프로필을 찾을 수 없습니다. 운영진에게 확인해 주세요.');
+            return;
+          }
+          const { error: rpcError } = await wtwtSB.rpc('wtwt_admin_upsert_own_member_profile', {
+            p_name: name, p_gender: '여성', p_start_date: startDate, p_phone: phone,
+            p_kakao: kakao || '', p_days: ['월', '수', '토', '일']
+          });
+          if (rpcError) throw rpcError;
+        }
+        await syncMyApprovedProfile();
+        await syncApprovedMembersToLocalStorage();
+        await renderApprovedMemberDirectory();
+        renderMyMember();
+        setMsg('회원 프로필이 저장되었습니다. 관리자 권한은 그대로 유지됩니다.');
+      } catch (e) {
+        setMsg('저장 실패: ' + (e?.message || String(e)));
+      } finally {
+        if (btn) { btn.disabled = false; btn.textContent = '저장하기'; }
+      }
+    };
+    const PARTNER_KEY = 'wtwt-partner-board-preview-v1';
+    function partnerRecords() { try { return JSON.parse(localStorage.getItem(PARTNER_KEY) || '[]') } catch { return [] } }
+    function partnerSave(items) { localStorage.setItem(PARTNER_KEY, JSON.stringify(items)); renderPartnerBoard() }
+    function postPartnerRequest() { const owner = currentWtwtMember(); if (!owner) return alert('먼저 MY에서 본인 프로필을 선택해 주세요.'); const event = document.getElementById('partnerEvent').value.trim(), date = document.getElementById('partnerEventDate').value, memo = document.getElementById('partnerMemo').value.trim(); if (!event || !date) return alert('대회명과 날짜를 입력해 주세요.'); partnerSave([...partnerRecords(), { id: String(Date.now()), ownerId: owner.id, owner: owner.name, event, date, memo, applications: [], matched: null }]); document.getElementById('partnerEvent').value = ''; document.getElementById('partnerMemo').value = '' }
+    function applyPartner(id) { const me = currentWtwtMember(), rows = partnerRecords(), r = rows.find(x => x.id === id); if (!me) return alert('먼저 MY에서 본인 프로필을 선택해 주세요.'); if (!r || r.ownerId === me.id || r.matched) return; if (!r.applications.some(x => x.id === me.id)) r.applications.push({ id: me.id, name: me.name }); partnerSave(rows) }
+    function acceptPartner(id, appId) { const me = currentWtwtMember(), rows = partnerRecords(), r = rows.find(x => x.id === id); if (!r || !me || r.ownerId !== me.id) return; const partner = r.applications.find(x => x.id === appId); if (!partner) return; r.matched = partner; partnerSave(rows) }
+    function renderPartnerBoard() {
+      const box = document.getElementById('partnerBoardList'); if (!box) return;
+      const me = currentWtwtMember();
+      box.innerHTML = partnerRecords().map(r => {
+        const owner = me?.id === r.ownerId;
+        let controls = '';
+        if (r.matched) controls = `<div class="chip">파트너 확정 · ${wtwtEscape(r.owner)} + ${wtwtEscape(r.matched.name)}</div>`;
+        else if (owner) controls = `<div class="muted">신청자 ${r.applications.length}명</div>` + r.applications.map(a => `<div class="row item"><span>${wtwtEscape(a.name)}</span><button class="soft" onclick="acceptPartner('${r.id}','${a.id}')">파트너 확정</button></div>`).join('');
+        else controls = `<button class="soft" onclick="applyPartner('${r.id}')">파트너 신청</button>`;
+        return `<div class="item"><b>${wtwtEscape(r.event)}</b> · ${wtwtEscape(r.date)}<div class="muted">모집자 ${wtwtEscape(r.owner)} · ${wtwtEscape(r.memo || '')}</div>${controls}</div>`;
+      }).join('') || '<p class="muted">현재 모집 중인 대회가 없습니다.</p>';
+    }
+    function renderAdminMatchOverview(date, people) { const box = document.getElementById('adminMatchOverview'); if (!box) return; const history = drawHistory(date); const pairs = []; for (let i = 0; i < people.length; i++)for (let j = i + 1; j < people.length; j++) { const a = people[i], b = people[j], key = dkey(a.id, b.id), p = history.partners[key] || 0, o = history.opponents[key] || 0; if (p || o) pairs.push({ a: a.name, b: b.name, p, o }) } pairs.sort((a, b) => (b.p * 2 + b.o) - (a.p * 2 + a.o)); box.innerHTML = pairs.slice(0, 30).map(x => '<div class="match-history-row"><span>' + wtwtEscape(x.a) + ' · ' + wtwtEscape(x.b) + '</span><span><b>파트너 ' + x.p + '</b> <small>상대 ' + x.o + '</small></span></div>').join('') || '<p class="muted">선택 날짜 이전에 확정된 동일 요일 경기 기록이 없습니다.</p>' }
+    const _oldRenderMyMember = renderMyMember; renderMyMember = function () { _oldRenderMyMember(); const m = currentWtwtMember(); for (const [id, key] of [['editMyName', 'name'], ['editMyStart', 'start'], ['editMyPhone', 'phone'], ['editMyKakao', 'kakao']]) { const el = document.getElementById(id); if (el && document.activeElement !== el) el.value = m?.[key] || '' } };
+    const _oldDrawRefresh = drawRefresh; drawRefresh = function () { _oldDrawRefresh(); const date = document.getElementById('adminDrawDate')?.value; if (date) renderAdminMatchOverview(date, drawPlayers(date)) };
+    const _oldGo = go; go = function (i, b) { _oldGo(i, b); if (i === 'partnerBoard') renderPartnerBoard(); if (i === 'my') renderMyMember(); if (i === 'admin') drawRefresh() };
+  </script>
+  <div style="max-width:440px;margin:16px auto;padding:8px;font-size:11px;color:#777">※ C형 디자인·대진 기능 미리보기입니다. 회원/출석/대진
+    기록은 이 브라우저에만 저장됩니다. 실제 운영 전 로그인 및 공유 DB·권한 보안 연결이 필요합니다.</div>
+  <script>
+    let wtwtGuestPreview = false;
+    function wtwtToggleGuest() {
+      wtwtGuestPreview = !wtwtGuestPreview;
+      const nav = document.querySelector('nav');
+      nav.querySelectorAll('button').forEach(btn => {
+        const target = (btn.getAttribute('onclick') || '').match(/go\('([^']+)'/);
+        const page = target && target[1];
+        if (wtwtGuestPreview) { btn.style.display = ['home', 'play', 'apply'].includes(page) ? '' : 'none'; if (page === 'apply') btn.textContent = '게스트 신청'; }
+        else { btn.style.display = ''; if (page === 'apply') btn.textContent = '신청'; }
+      });
+      document.getElementById('guestPreviewToggle').textContent = wtwtGuestPreview ? '회원 화면 보기' : '게스트 화면 보기';
+      const app = document.getElementById('apply');
+      if (app) app.querySelectorAll('.card').forEach(card => { card.style.display = wtwtGuestPreview && !card.textContent.includes('게스트 신청') ? 'none' : '' });
+      go('home', nav.querySelector('button'));
+    }
+    const wtwtOriginalGo = go;
+    go = function (i, b) { if (wtwtGuestPreview && !['home', 'play', 'apply'].includes(i)) i = 'home'; wtwtOriginalGo(i, b) };
+  </script>
+  <script>
+    // Attendance dates are restricted to WTWT regular meetings (Mon/Wed/Sat/Sun).
+    (function () {
+      const allowed = new Set([0, 1, 3, 6]);
+      const names = ['일', '월', '화', '수', '목', '금', '토'];
+      const fmt = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+      function populate() {
+        const el = document.getElementById('attDate'); if (!el) return;
+        const previous = el.value;
+        const now = new Date(); now.setHours(12, 0, 0, 0);
+        const dates = [];
+        for (let i = 0; i <= 120; i++) {
+          const d = new Date(now); d.setDate(now.getDate() + i);
+          if (allowed.has(d.getDay())) dates.push({ date: fmt(d), day: names[d.getDay()] });
+        }
+        el.innerHTML = dates.map(x => '<option value="' + x.date + '">' + x.date + ' (' + x.day + ') 정기 모임</option>').join('');
+        if (dates.some(x => x.date === previous)) el.value = previous;
+        else if (dates.length) el.value = dates[0].date;
+        if (typeof renderAttendance === 'function') renderAttendance();
+      }
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', populate);
+      else populate();
+    })();
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script>
+    const WTWT_SB_URL = 'https://isvlgifriquughskkvda.supabase.co';
+    const WTWT_SB_KEY = 'sb_publishable_eZqCaPx_Ul7cFgl6tLM0Eg_5fyGPKxL';
+    const wtwtSB = window.supabase?.createClient(WTWT_SB_URL, WTWT_SB_KEY);
+    let wtwtAuthSignup = false; window.wtwtRole = null;
+    function authMessage(m) { document.getElementById('authStatus').textContent = m }
+    function wtwtAuthToggle() { wtwtAuthSignup = !wtwtAuthSignup; document.getElementById('authTitle').textContent = wtwtAuthSignup ? '회원가입' : '회원 로그인'; document.getElementById('authName').style.display = wtwtAuthSignup ? 'block' : 'none'; document.getElementById('authMain').textContent = wtwtAuthSignup ? '가입 신청' : '로그인'; document.getElementById('authToggle').textContent = wtwtAuthSignup ? '로그인으로 돌아가기' : '회원가입하기'; authMessage('') }
+    async function wtwtAuthSubmit() { if (!wtwtSB) return authMessage('인증 라이브러리를 불러오지 못했습니다. 인터넷 연결을 확인하세요.'); const email = document.getElementById('authEmail').value.trim(), password = document.getElementById('authPassword').value; if (!email || password.length < 6) return authMessage('이메일과 6자 이상 비밀번호를 입력해 주세요.'); try { if (wtwtAuthSignup) { const name = document.getElementById('authName').value.trim(); if (!name) return authMessage('이름을 입력해 주세요.'); const { error } = await wtwtSB.auth.signUp({ email, password, options: { data: { display_name: name }, emailRedirectTo: location.origin + location.pathname } }); if (error) throw error; authMessage('가입 신청 완료. 이메일 인증 후 운영진 승인을 기다려 주세요.') } else { const { error } = await wtwtSB.auth.signInWithPassword({ email, password }); if (error) throw error; await wtwtAuthCheck() } } catch (e) { authMessage(e.message || '로그인에 실패했습니다.') } }
+    async function wtwtAuthReset() { if (!wtwtSB) return; const email = document.getElementById('authEmail').value.trim(); if (!email) return authMessage('먼저 이메일을 입력해 주세요.'); const { error } = await wtwtSB.auth.resetPasswordForEmail(email, { redirectTo: location.origin + location.pathname }); authMessage(error ? error.message : '비밀번호 재설정 메일을 확인해 주세요.') }
+    async function wtwtAuthSignOut() { await wtwtSB?.auth.signOut(); window.wtwtRole = null; document.getElementById('wtwtAuthGate').hidden = false; document.getElementById('authLogout').style.display = 'none'; go('home') }
+    async function wtwtAuthCheck() { if (!wtwtSB) return authMessage('로그인 서비스를 불러오지 못했습니다.'); const { data: { user }, error } = await wtwtSB.auth.getUser(); if (error || !user) { window.wtwtRole = null; document.getElementById('wtwtAuthGate').hidden = false; return } if (!user.email_confirmed_at) { authMessage('이메일 인증을 완료해 주세요.'); return } const { data: account, error: roleError } = await wtwtSB.from('wtwt_accounts').select('role,display_name').eq('user_id', user.id).maybeSingle(); if (roleError) { authMessage('계정 권한 확인 실패: ' + roleError.message); return } const role = account?.role || 'pending'; window.wtwtRole = role; window.wtwtCurrentUserId = user.id; document.getElementById('wtwtAuthGate').hidden = true; document.getElementById('authLogout').style.display = 'block'; document.getElementById('guestPreviewToggle').style.display = 'none'; if (role === 'pending') { document.querySelectorAll('nav button').forEach(btn => btn.style.display = 'none'); go('memberSignup'); const { data: existing } = await wtwtSB.from('wtwt_member_signups').select('status').eq('user_id', user.id).maybeSingle(); if (existing?.status === 'pending') document.getElementById('signupMessage').textContent = '신청이 접수되어 운영진 승인을 기다리고 있습니다.'; else if (existing?.status === 'rejected') document.getElementById('signupMessage').textContent = '이전 신청이 거절되었습니다. 내용을 확인한 뒤 다시 신청할 수 있습니다.'; return } document.querySelectorAll('nav button').forEach(btn => { const label = btn.textContent.trim(); btn.style.display = role === 'guest' ? (['HOME', 'PLAY', '신청'].includes(label) ? '' : 'none') : label === 'ADMIN' && !['admin', 'super_admin'].includes(role) ? 'none' : '' }); go('home'); await syncMyApprovedProfile().catch(e => console.warn('내 프로필 동기화 실패:', e.message)); if (['admin', 'super_admin'].includes(role)) { const rosterLoaded = await wtwtLoadServerRoster(); if (rosterLoaded) { await syncApprovedMembersToLocalStorage(); await wtwtLoadServerRoster() } renderSignupPending() } renderApprovedMemberDirectory() }
+    wtwtSB?.auth.onAuthStateChange(() => { setTimeout(wtwtAuthCheck, 0) }); wtwtAuthCheck();
+  </script>
+</body>
+
+</html>
