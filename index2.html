@@ -1522,7 +1522,7 @@
       const msg = document.getElementById('memberRegisterMessage');
       if (!name || !days.length) { msg.textContent = '이름과 등록 요일을 선택해 주세요.'; return; }
       if (!wtwtSB || !['admin','super_admin'].includes(window.wtwtRole)) { msg.textContent = '관리자 로그인 후 서버 저장을 사용할 수 있습니다.'; return; }
-      const member = { name, days, role:document.getElementById('newMemberRole').value, gender:document.getElementById('newMemberGender').value, start:document.getElementById('newMemberStart').value, grade:document.getElementById('newMemberGrade').value, phone:document.getElementById('newMemberPhone').value, kakao:document.getElementById('newMemberKakao').value, joiningPaid:false, shirtGiven:false, monthlyPaid:false, isActive:true };
+      const member = { name, days, role:'member', gender:document.getElementById('newMemberGender').value, start:document.getElementById('newMemberStart').value, grade:document.getElementById('newMemberGrade').value, phone:document.getElementById('newMemberPhone').value, kakao:document.getElementById('newMemberKakao').value, joiningPaid:false, shirtGiven:false, monthlyPaid:false, isActive:true };
       msg.textContent = '서버에 저장하는 중…';
       const {data, error} = await wtwtSB.from('wtwt_members').insert(wtwtMemberToRow(member)).select('id,auth_user_id,display_name,days,member_type,gender,start_date,phone,kakao,grade,is_active,joining_paid,shirt_given,monthly_paid').single();
       if (error) { msg.textContent = '서버 저장 실패: ' + error.message; return; }
